@@ -1,0 +1,42 @@
+{
+  "project": {
+    "name": "CodeFixer",
+    "seed": 7
+  },
+  "paths": {
+    "tasks_file": "configs/tasks_toy.yaml",
+    "logs_dir": "logs",
+    "workspaces_dir": "logs/workspaces",
+    "results_file": "evaluation/results.json",
+    "summary_file": "evaluation/summary.md",
+    "trajectory_file": "logs/sample_trajectory.jsonl",
+    "replay_file": "logs/replay_buffer.jsonl"
+  },
+  "agent": {
+    "max_steps": 6,
+    "use_memory": true,
+    "use_test_feedback": true,
+    "use_self_evolution": true
+  },
+  "policy": {
+    "type": "rule_based"
+  },
+  "llm": {
+    "provider": "openai",
+    "model": "gpt-4.1-mini",
+    "max_tokens": 800,
+    "temperature": 0.0,
+    "api_key_env": "OPENAI_API_KEY",
+    "endpoint": "https://api.openai.com/v1/chat/completions"
+  },
+  "environment": {
+    "test_timeout_sec": 20,
+    "allowed_edit_globs": ["*.py"],
+    "unsafe_edit_globs": ["test_*.py"]
+  },
+  "evaluation": {
+    "pass_at_k": 3,
+    "trials_per_task": 1,
+    "cost_per_tool_call": 0.001
+  }
+}

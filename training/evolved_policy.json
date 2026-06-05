@@ -1,0 +1,28 @@
+{
+  "preferred_actions": [
+    "run_tests",
+    "edit_file"
+  ],
+  "learned_bug_patterns": [
+    "Establish failing test signal before editing.",
+    "Make the upper bound inclusive.",
+    "Guard empty input before division.",
+    "Sort scores descending before slicing.",
+    "Strip whitespace before lowercasing.",
+    "Guard empty input before max().",
+    "Use the previous two DP states.",
+    "Increment existing counts instead of resetting.",
+    "Catch ValueError and return the default."
+  ],
+  "num_success": 8,
+  "num_failure": 0,
+  "memory": {
+    "action_patterns": {
+      "edit_file": {
+        "success": 8,
+        "failure": 0
+      }
+    },
+    "failure_reasons": []
+  }
+}

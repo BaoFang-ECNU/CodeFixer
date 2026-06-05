@@ -1,0 +1,60 @@
+{
+  "tasks": [
+    {
+      "task_id": "task_001",
+      "issue": "examples/toy_tasks/task_001/issue.md",
+      "source_files": ["examples/toy_tasks/task_001/buggy_code.py"],
+      "test_files": ["examples/toy_tasks/task_001/test_buggy_code.py"],
+      "test_command": "python -m pytest test_buggy_code.py"
+    },
+    {
+      "task_id": "task_002",
+      "issue": "examples/toy_tasks/task_002/issue.md",
+      "source_files": ["examples/toy_tasks/task_002/buggy_code.py"],
+      "test_files": ["examples/toy_tasks/task_002/test_buggy_code.py"],
+      "test_command": "python -m pytest test_buggy_code.py"
+    },
+    {
+      "task_id": "task_003",
+      "issue": "examples/toy_tasks/task_003/issue.md",
+      "source_files": ["examples/toy_tasks/task_003/buggy_code.py"],
+      "test_files": ["examples/toy_tasks/task_003/test_buggy_code.py"],
+      "test_command": "python -m pytest test_buggy_code.py"
+    },
+    {
+      "task_id": "task_004",
+      "issue": "examples/toy_tasks/task_004/issue.md",
+      "source_files": ["examples/toy_tasks/task_004/buggy_code.py"],
+      "test_files": ["examples/toy_tasks/task_004/test_buggy_code.py"],
+      "test_command": "python -m pytest test_buggy_code.py"
+    },
+    {
+      "task_id": "task_005",
+      "issue": "examples/toy_tasks/task_005/issue.md",
+      "source_files": ["examples/toy_tasks/task_005/buggy_code.py"],
+      "test_files": ["examples/toy_tasks/task_005/test_buggy_code.py"],
+      "test_command": "python -m pytest test_buggy_code.py"
+    },
+    {
+      "task_id": "task_006",
+      "issue": "examples/toy_tasks/task_006/issue.md",
+      "source_files": ["examples/toy_tasks/task_006/buggy_code.py"],
+      "test_files": ["examples/toy_tasks/task_006/test_buggy_code.py"],
+      "test_command": "python -m pytest test_buggy_code.py"
+    },
+    {
+      "task_id": "task_007",
+      "issue": "examples/toy_tasks/task_007/issue.md",
+      "source_files": ["examples/toy_tasks/task_007/buggy_code.py"],
+      "test_files": ["examples/toy_tasks/task_007/test_buggy_code.py"],
+      "test_command": "python -m pytest test_buggy_code.py"
+    },
+    {
+      "task_id": "task_008",
+      "issue": "examples/toy_tasks/task_008/issue.md",
+      "source_files": ["examples/toy_tasks/task_008/buggy_code.py"],
+      "test_files": ["examples/toy_tasks/task_008/test_buggy_code.py"],
+      "test_command": "python -m pytest test_buggy_code.py"
+    }
+  ]
+}
