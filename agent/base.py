@@ -12,14 +12,18 @@ class AgentResult:
 
     task_id: str
     success: bool
+    visible_success: bool
+    hidden_success: bool | None
     final_answer: str
     patch_diff: str
     reward: float
     steps: int
     tool_calls: int
+    test_runs: int
     runtime_sec: float
     patch_size: int
     patch_diff_lines: int
+    patch_file_count: int
     unsafe_edits: int
     timed_out: bool
     failure_reason: str
@@ -28,6 +32,12 @@ class AgentResult:
     final_test_output: str
     memory_enabled: bool
     test_feedback_enabled: bool
+    system_version: str
+    bug_type: str
+    language: str
+    project_source: str
+    diagnosis: dict[str, Any] | None
+    critic_report: dict[str, Any] | None
     trajectory: dict[str, Any]
 
 
