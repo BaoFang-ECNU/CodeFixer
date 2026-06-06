@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import shlex
+import shutil
 import subprocess
 import sys
 import time
@@ -68,6 +69,10 @@ class TestRunner:
         parts = shlex.split(command, posix=False)
         if parts and parts[0].lower() in {"python", "python3"}:
             parts[0] = sys.executable
+        if parts and parts[0].lower() in {"node", "node.exe"} and shutil.which(parts[0]) is None:
+            bundled = Path.home() / ".cache" / "codex-runtimes" / "codex-primary-runtime" / "dependencies" / "node" / "bin" / "node.exe"
+            if bundled.exists():
+                parts[0] = str(bundled)
         return parts
 
     def _run_minipytest(self, args: list[str], cwd: Path) -> TestResult:
