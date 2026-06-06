@@ -36,3 +36,12 @@ summarizes failures, writes an evolved memory artifact, and exports:
 - OPD JSONL: `observation`, `teacher_action`, `reward`, `rationale`.
 - Best-of-N ranking: candidate patches are sorted by reward, safety, patch size,
   and tool-call cost.
+
+## Multi-System Evaluation
+
+CodeFixer now evaluates three versions of the repair system. Baseline disables
+feedback-driven repair and long-term memory. +Feedback enables test feedback,
+diagnosis, repair, and critic checks. +Learning/Evolution additionally updates
+memory patterns and exports DPO, OPD, and reward-weighted regression data. This
+turns the project from a single-agent toy loop into a small experimental
+platform for measuring the effect of feedback and self-evolution.
