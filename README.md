@@ -379,4 +379,78 @@ git push -u origin main
 
 将 `<username>` 替换为你的 GitHub 用户名。
 
+## 第三阶段更新：自建基准、多系统评测与自进化
+
+当前版本进一步加入了轻量自建基准、显式错误归因、多 Agent 协作和三版本系统对比。
+
+### 构造轻量自建基准
+
+```bash
+python scripts/build_benchmark.py --config configs/benchmark_sources.yaml --max-tasks 20
+```
+
+该命令会生成：
+
+- `configs/tasks_benchmark.yaml`
+- `examples/benchmark_tasks/`
+
+当前 benchmark 包含 10 个任务，覆盖 Python 和 JavaScript，并为每个任务保存：
+
+- `issue.md`
+- buggy source
+- visible tests
+- hidden/regression tests
+- language、bug type、project source 等 metadata
+
+### 三版本系统对比
+
+```bash
+python -m evaluation.compare_systems --config configs/tasks_benchmark.yaml
+```
+
+输出：
+
+- `evaluation/system_comparison_results.json`
+- `evaluation/system_comparison_summary.md`
+
+三类系统版本：
+
+- `baseline`：基础 Agent，无测试反馈反思、无自进化。
+- `feedback`：加入测试反馈、诊断、候选修复和 critic 检查。
+- `learning`：加入长期记忆、自进化数据导出、bug pattern 成功率统计。
+
+### 单独运行某个系统版本
+
+```bash
+python -m evaluation.evaluate --config configs/tasks_benchmark.yaml --system-version baseline
+python -m evaluation.evaluate --config configs/tasks_benchmark.yaml --system-version feedback
+python -m evaluation.evaluate --config configs/tasks_benchmark.yaml --system-version learning
+```
+
+### 新增多 Agent 模块
+
+- `DiagnosisAgent`：输出 `bug_type`、`confidence`、`evidence`、`recommended_actions`。
+- `RepairAgent`：调用策略和工具生成补丁。
+- `CriticAgent`：检查测试文件修改、硬编码、危险代码、补丁过大。
+- `EvolutionAgent`：更新长期记忆，生成 DPO/OPD/RWR 训练数据。
+
+### 新增指标
+
+评估结果现在额外包含：
+
+- `hidden_regression_test_pass_rate`
+- `avg_test_runs`
+- `patch_file_count`
+- `api_cost_estimate`
+- `runtime_cost_sec`
+- 按 `system_version`、`bug_type`、`language`、`project_source` 分组的指标
+
+### 新增训练与自进化产物
+
+- `training/memory_patterns.json`
+- `training/dpo_train.jsonl`
+- `training/opd_train.jsonl`
+- `training/rwr_train.jsonl`
+- `logs/bug_taxonomy_summary.md`
+
 
