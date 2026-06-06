@@ -1,0 +1,19 @@
+{
+  "output_tasks_file": "configs/tasks_benchmark.yaml",
+  "output_dir": "examples/benchmark_tasks",
+  "sources": [
+    {
+      "name": "manual_python_micro",
+      "language": "python",
+      "construction": "manual_injection",
+      "project_source": "open-source-style-python-utils"
+    },
+    {
+      "name": "manual_javascript_micro",
+      "language": "javascript",
+      "construction": "manual_injection",
+      "project_source": "open-source-style-js-utils"
+    }
+  ]
+}
+
