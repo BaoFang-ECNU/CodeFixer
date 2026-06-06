@@ -28,11 +28,17 @@ class SelfEvolutionTrainer:
         failures = [t for t in trajectories if not t.get("success")]
         action_counter: Counter[str] = Counter()
         rationale_counter: Counter[str] = Counter()
+        bug_counter: Counter[str] = Counter()
+        bug_success_counter: Counter[str] = Counter()
         failure_reasons: Counter[str] = Counter()
 
         for traj in trajectories:
             last_action = ""
             for step in traj.get("steps", []):
+                bug_type = step.get("observation", {}).get("diagnosis", {}).get("bug_type") or step.get("observation", {}).get("bug_type_hint", "unknown")
+                bug_counter[bug_type] += 1
+                if traj.get("success"):
+                    bug_success_counter[bug_type] += 1
                 action = step.get("action", "")
                 last_action = action
                 action_counter[action] += 1
@@ -52,14 +58,23 @@ class SelfEvolutionTrainer:
             "learned_bug_patterns": [name for name, _ in rationale_counter.most_common(10)],
             "num_success": len(successes),
             "num_failure": len(failures),
+            "bug_type_success_rate": {
+                bug_type: round(bug_success_counter[bug_type] / count, 4)
+                for bug_type, count in bug_counter.items()
+            },
             "memory": self.memory.to_dict(),
         }
 
         (output_dir / "evolved_policy.json").write_text(json.dumps(evolved_policy, indent=2, ensure_ascii=False), encoding="utf-8")
+        (output_dir / "memory_patterns.json").write_text(json.dumps(evolved_policy["bug_type_success_rate"], indent=2, ensure_ascii=False), encoding="utf-8")
         export_dpo_pairs(dpo_pairs, output_dir / "dpo_data.jsonl")
+        export_dpo_pairs(dpo_pairs, output_dir / "dpo_train.jsonl")
         export_opd_records(opd_records, output_dir / "opd_distill.jsonl")
+        export_opd_records(opd_records, output_dir / "opd_train.jsonl")
+        self._export_rwr(trajectories, output_dir / "rwr_train.jsonl")
         summary = self._summary_markdown(evolved_policy, failure_reasons)
         (logs_dir / "evolution_summary.md").write_text(summary, encoding="utf-8")
+        (logs_dir / "bug_taxonomy_summary.md").write_text(self._bug_summary(evolved_policy), encoding="utf-8")
         return evolved_policy
 
     @staticmethod
@@ -156,4 +171,31 @@ class SelfEvolutionTrainer:
             lines.extend(f"- {reason}: {count}" for reason, count in failure_reasons.items())
         else:
             lines.append("- none")
+        return "\n".join(lines) + "\n"
+
+    @staticmethod
+    def _export_rwr(trajectories: list[dict[str, Any]], path: Path) -> None:
+        records: list[dict[str, Any]] = []
+        for traj in trajectories:
+            for step in traj.get("steps", []):
+                records.append(
+                    {
+                        "observation": step.get("observation", {}),
+                        "action": step.get("action"),
+                        "action_args": step.get("action_args", {}),
+                        "reward": step.get("reward", 0),
+                        "weight": max(0.01, 1.0 + float(step.get("reward", 0))),
+                    }
+                )
+        path.write_text("\n".join(json.dumps(record, ensure_ascii=False) for record in records) + ("\n" if records else ""), encoding="utf-8")
+
+    @staticmethod
+    def _bug_summary(evolved_policy: dict[str, Any]) -> str:
+        lines = ["# Bug Taxonomy Summary", "", "| bug_type | success_rate |", "|---|---:|"]
+        rates = evolved_policy.get("bug_type_success_rate", {})
+        if not rates:
+            lines.append("| unknown | 0 |")
+        else:
+            for bug_type, rate in rates.items():
+                lines.append(f"| {bug_type} | {rate} |")
         return "\n".join(lines) + "\n"
