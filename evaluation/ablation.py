@@ -8,6 +8,7 @@ from pathlib import Path
 
 from evaluation.evaluate import run_evaluation
 from evaluation.metrics import summary_markdown
+from env.task_loader import load_yaml
 
 
 ABLATIONS = {
@@ -25,10 +26,12 @@ def run_ablation(config_path: str = "configs/default.yaml") -> dict:
     """Run configured ablations and write a summary."""
 
     project_root = Path.cwd()
+    ablation_config = load_yaml(project_root / "configs" / "ablations.yaml")
+    configured_ablations = ablation_config.get("ablations", ABLATIONS)
     all_results = {}
     rows = []
-    for name, overrides in ABLATIONS.items():
-        payload = run_evaluation(config_path, overrides=overrides)
+    for name, overrides in configured_ablations.items():
+        payload = run_evaluation(config_path, overrides=overrides, system_version="learning")
         all_results[name] = payload
         row = {
             "task_id": name,
@@ -47,7 +50,7 @@ def run_ablation(config_path: str = "configs/default.yaml") -> dict:
     out_file.write_text(json.dumps(all_results, indent=2, ensure_ascii=False), encoding="utf-8")
     metrics = {name: payload["metrics"]["pass_at_1"] for name, payload in all_results.items()}
     summary = "# Ablation Summary\n\n" + "\n".join(f"- {name}: pass_at_1={score}" for name, score in metrics.items()) + "\n\n"
-    summary += summary_markdown({"pass_at_1": 0, "pass_at_k": 0, "visible_test_pass_rate": 0, "avg_reward": 0, "avg_steps": 0, "avg_tool_calls": 0, "avg_runtime_sec": 0, "avg_patch_size": 0, "avg_patch_diff_lines": 0, "unsafe_edit_rate": 0, "timeout_rate": 0, "cost_estimate": 0}, rows, title="Ablation Rows")
+    summary += summary_markdown({"pass_at_1": 0, "pass_at_k": 0, "visible_test_pass_rate": 0, "hidden_regression_test_pass_rate": 0, "avg_reward": 0, "avg_steps": 0, "avg_tool_calls": 0, "avg_test_runs": 0, "avg_runtime_sec": 0, "avg_patch_size": 0, "avg_patch_diff_lines": 0, "patch_file_count": 0, "unsafe_edit_rate": 0, "timeout_rate": 0, "api_cost_estimate": 0, "runtime_cost_sec": 0, "cost_estimate": 0}, rows, title="Ablation Rows")
     (project_root / "evaluation" / "ablation_summary.md").write_text(summary, encoding="utf-8")
     return all_results
 
