@@ -18,6 +18,9 @@
     "use_test_feedback": true,
     "use_self_evolution": true
   },
+  "orchestrator": {
+    "mode": "single_agent"
+  },
   "policy": {
     "type": "rule_based"
   },
@@ -35,6 +38,7 @@
     "unsafe_edit_globs": ["test_*.py"]
   },
   "evaluation": {
+    "system_version": "feedback",
     "pass_at_k": 3,
     "trials_per_task": 1,
     "cost_per_tool_call": 0.001
