@@ -61,6 +61,16 @@ weights yet.
 4. Add hidden/regression test suites.
 5. Train with DPO, OPD, or RLVR on exported trajectories.
 
+## Third-Stage Implementation
+
+The project now includes a lightweight benchmark builder that generates Python
+and JavaScript repair tasks with visible and hidden/regression tests. Evaluation
+can compare three system versions: baseline, feedback, and learning/evolution.
+The multi-agent path adds DiagnosisAgent, RepairAgent, CriticAgent, and
+EvolutionAgent. Metrics now include hidden/regression pass rate, average test
+runs, patch file count, API cost estimate, runtime cost, and grouped results by
+system version, bug type, language, and project source.
+
 ## Risks and Limits
 
 Rule-based repair only handles simple patterns. Toy tests do not prove
