@@ -74,13 +74,19 @@ class RuleBasedPolicy(Policy):
 
         if ("strip" in issue_and_output or "whitespace" in issue_and_output or "normalize" in issue_and_output) and "return name.lower()" in content:
             return ActionProposal("edit_file", {"path": path, "old_text": "return name.lower()", "new_text": "return name.strip().lower()"}, "Strip whitespace before lowercasing.")
+        if ("strip" in issue_and_output or "whitespace" in issue_and_output or "normalize" in issue_and_output) and "return name.toLowerCase();" in content:
+            return ActionProposal("edit_file", {"path": path, "old_text": "return name.toLowerCase();", "new_text": "return name.trim().toLowerCase();"}, "Trim whitespace before lowercasing.")
 
         if ("empty" in issue_and_output or "none" in issue_and_output) and "return max(values)" in content:
             return ActionProposal("edit_file", {"path": path, "old_text": "return max(values)", "new_text": "if not values:\n        return None\n    return max(values)"}, "Guard empty input before max().")
+        if ("empty" in issue_and_output or "null" in issue_and_output) and "return Math.max(...values);" in content:
+            return ActionProposal("edit_file", {"path": path, "old_text": "return Math.max(...values);", "new_text": "if (values.length === 0) return null;\n  return Math.max(...values);"}, "Guard empty arrays before Math.max.")
 
         if ("fibonacci" in issue_and_output or "dynamic programming" in issue_and_output or "transition" in issue_and_output) and "dp[-1] + dp[-1]" in content:
             return ActionProposal("edit_file", {"path": path, "old_text": "dp[-1] + dp[-1]", "new_text": "dp[-1] + dp[-2]"}, "Use the previous two DP states.")
 
+        if ("count" in issue_and_output or "duplicate" in issue_and_output) and "counts[word] = 1;" in content:
+            return ActionProposal("edit_file", {"path": path, "old_text": "counts[word] = 1;", "new_text": "counts[word] = (counts[word] || 0) + 1;"}, "Increment existing JavaScript counts instead of resetting.")
         if ("count" in issue_and_output or "duplicate" in issue_and_output) and "counts[word] = 1" in content:
             return ActionProposal("edit_file", {"path": path, "old_text": "counts[word] = 1", "new_text": "counts[word] = counts.get(word, 0) + 1"}, "Increment existing counts instead of resetting.")
 
@@ -90,6 +96,8 @@ class RuleBasedPolicy(Policy):
                 {"path": path, "old_text": "return int(text)", "new_text": "try:\n        return int(text)\n    except ValueError:\n        return default"},
                 "Catch ValueError and return the default.",
             )
+        if ("invalid" in issue_and_output or "default" in issue_and_output or "nan" in issue_and_output) and "return Number.parseInt(text, 10);" in content:
+            return ActionProposal("edit_file", {"path": path, "old_text": "return Number.parseInt(text, 10);", "new_text": "const value = Number.parseInt(text, 10);\n  return Number.isNaN(value) ? defaultValue : value;"}, "Return default when parseInt yields NaN.")
 
         if "/ len(" in content and "if not" not in content and "ZeroDivisionError" in observation.get("last_test_output", ""):
             old_line = next((line.strip() for line in content.splitlines() if "/ len(" in line), "")
