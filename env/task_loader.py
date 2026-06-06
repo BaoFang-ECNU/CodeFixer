@@ -36,7 +36,15 @@ def load_tasks(tasks_file: str | Path) -> list[Task]:
                 source_files=[Path(p) for p in item.get("source_files", [])],
                 test_files=[Path(p) for p in item.get("test_files", [])],
                 test_command=item["test_command"],
-                metadata={k: v for k, v in item.items() if k not in {"task_id", "issue", "source_files", "test_files", "test_command"}},
+                language=item.get("language", "python"),
+                visible_test_command=item.get("visible_test_command", item.get("test_command")),
+                hidden_test_command=item.get("hidden_test_command"),
+                project_source=item.get("project_source", "toy"),
+                bug_type=item.get("bug_type", "unknown"),
+                difficulty=item.get("difficulty", "easy"),
+                allowed_files=[Path(p) for p in item.get("allowed_files", item.get("source_files", []))],
+                hidden_test_files=[Path(p) for p in item.get("hidden_test_files", [])],
+                metadata={k: v for k, v in item.items() if k not in {"task_id", "issue", "source_files", "test_files", "hidden_test_files", "test_command", "visible_test_command", "hidden_test_command", "language", "project_source", "bug_type", "difficulty", "allowed_files"}},
             )
         )
     return tasks
