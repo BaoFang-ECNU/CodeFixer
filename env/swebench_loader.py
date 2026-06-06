@@ -36,6 +36,13 @@ def load_swebench_lite_tasks(tasks_file: str | Path, issue_dir: str | Path = "lo
                 source_files=[Path(p) for p in item.get("file_hints", [])],
                 test_files=[],
                 test_command=item.get("test_command", "python -m pytest"),
+                language=item.get("language", "python"),
+                visible_test_command=item.get("test_command", "python -m pytest"),
+                hidden_test_command=item.get("hidden_test_command"),
+                project_source=item.get("repo", "swebench_lite"),
+                bug_type=item.get("bug_type", "unknown"),
+                difficulty=item.get("difficulty", "unknown"),
+                allowed_files=[Path(p) for p in item.get("file_hints", [])],
                 metadata={
                     "repo": item.get("repo"),
                     "base_commit": item.get("base_commit"),
@@ -45,4 +52,3 @@ def load_swebench_lite_tasks(tasks_file: str | Path, issue_dir: str | Path = "lo
             )
         )
     return tasks
-
