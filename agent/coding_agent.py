@@ -38,6 +38,9 @@ class CodingAgent(BaseAgent):
         config = config or {}
 
         for step_id in range(1, self.max_steps + 1):
+            if config.get("_diagnosis"):
+                observation["diagnosis"] = config["_diagnosis"]
+                observation["bug_type_hint"] = config["_diagnosis"].get("bug_type", observation.get("bug_type_hint", ""))
             memory_payload = self.memory.to_dict() if config.get("agent", {}).get("use_memory", True) else {}
             proposal = self.policy.propose_action(observation, memory_payload, config)
             tool_output = tools.execute(proposal.action, proposal.args)
@@ -95,19 +98,25 @@ class CodingAgent(BaseAgent):
         if trajectory_path:
             trajectory.save_jsonl(trajectory_path, append=True)
 
-        runtime = time.perf_counter() - started
         patch_diff = env.get_diff(count_tool=False)
+        hidden_result = env.run_hidden_tests()
+        runtime = time.perf_counter() - started
+        system_version = config.get("system_version", config.get("evaluation", {}).get("system_version", "feedback"))
         return AgentResult(
             task_id=env.task.task_id,
             success=trajectory.success,
+            visible_success=trajectory.success,
+            hidden_success=hidden_result.passed if hidden_result else None,
             final_answer=final_answer or env.final_answer(),
             patch_diff=patch_diff,
             reward=trajectory.total_reward,
             steps=len(trajectory.steps),
             tool_calls=env.tool_calls,
+            test_runs=env.test_runs,
             runtime_sec=runtime,
             patch_size=env.patch_size(),
             patch_diff_lines=sum(1 for line in patch_diff.splitlines() if line.startswith(("+", "-")) and not line.startswith(("+++", "---"))),
+            patch_file_count=self._patch_file_count(patch_diff),
             unsafe_edits=env.unsafe_edits,
             timed_out=timed_out,
             failure_reason=self._failure_reason(trajectory.success, timed_out, env.unsafe_edits, patch_diff, final_test_output),
@@ -116,6 +125,12 @@ class CodingAgent(BaseAgent):
             final_test_output=final_test_output,
             memory_enabled=bool(config.get("agent", {}).get("use_memory", True)),
             test_feedback_enabled=bool(config.get("agent", {}).get("use_test_feedback", True)),
+            system_version=system_version,
+            bug_type=env.task.bug_type,
+            language=env.task.language,
+            project_source=env.task.project_source,
+            diagnosis=config.get("_diagnosis"),
+            critic_report=config.get("_critic_report"),
             trajectory=trajectory.to_dict(),
         )
 
@@ -132,3 +147,7 @@ class CodingAgent(BaseAgent):
         if "ModuleNotFoundError" in final_test_output:
             return "dependency_missing"
         return "tests_still_failing"
+
+    @staticmethod
+    def _patch_file_count(patch_diff: str) -> int:
+        return sum(1 for line in patch_diff.splitlines() if line.startswith("+++ b/"))
