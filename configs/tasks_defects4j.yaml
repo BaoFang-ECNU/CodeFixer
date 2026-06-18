@@ -1,0 +1,121 @@
+{
+  "tasks": [
+    {
+      "task_id": "defects4j_Lang_1",
+      "language": "java",
+      "project_source": "defects4j",
+      "construction": "real_bug_checkout",
+      "bug_type": "real_java_bug",
+      "difficulty": "benchmark",
+      "issue": "examples/defects4j_tasks/defects4j_Lang_1.md",
+      "source_files": [],
+      "allowed_files": [],
+      "test_files": [],
+      "hidden_test_files": [],
+      "test_command": "defects4j test",
+      "visible_test_command": "defects4j test",
+      "hidden_test_command": "defects4j test",
+      "metadata": {
+        "task_id": "defects4j_Lang_1",
+        "project": "Lang",
+        "bug_id": 1,
+        "issue": "Fix Defects4J bug Lang-1. Use Defects4J triggering tests and project tests to validate the patch.",
+        "workspace": "outputs/defects4j_workspaces/defects4j_Lang_1",
+        "visible_test_command": "defects4j test",
+        "hidden_test_command": "defects4j test",
+        "source_files": [],
+        "allowed_files": [],
+        "metadata": {
+          "defects4j_project": "Lang",
+          "defects4j_bug_id": 1,
+          "requires_defects4j": true,
+          "recommended_setup": [
+            "java11",
+            "git",
+            "svn",
+            "perl",
+            "cpanm"
+          ]
+        }
+      }
+    },
+    {
+      "task_id": "defects4j_Lang_2",
+      "language": "java",
+      "project_source": "defects4j",
+      "construction": "real_bug_checkout",
+      "bug_type": "real_java_bug",
+      "difficulty": "benchmark",
+      "issue": "examples/defects4j_tasks/defects4j_Lang_2.md",
+      "source_files": [],
+      "allowed_files": [],
+      "test_files": [],
+      "hidden_test_files": [],
+      "test_command": "defects4j test",
+      "visible_test_command": "defects4j test",
+      "hidden_test_command": "defects4j test",
+      "metadata": {
+        "task_id": "defects4j_Lang_2",
+        "project": "Lang",
+        "bug_id": 2,
+        "issue": "Fix Defects4J bug Lang-2. Use Defects4J triggering tests and project tests to validate the patch.",
+        "workspace": "outputs/defects4j_workspaces/defects4j_Lang_2",
+        "visible_test_command": "defects4j test",
+        "hidden_test_command": "defects4j test",
+        "source_files": [],
+        "allowed_files": [],
+        "metadata": {
+          "defects4j_project": "Lang",
+          "defects4j_bug_id": 2,
+          "requires_defects4j": true,
+          "recommended_setup": [
+            "java11",
+            "git",
+            "svn",
+            "perl",
+            "cpanm"
+          ]
+        }
+      }
+    },
+    {
+      "task_id": "defects4j_Lang_3",
+      "language": "java",
+      "project_source": "defects4j",
+      "construction": "real_bug_checkout",
+      "bug_type": "real_java_bug",
+      "difficulty": "benchmark",
+      "issue": "examples/defects4j_tasks/defects4j_Lang_3.md",
+      "source_files": [],
+      "allowed_files": [],
+      "test_files": [],
+      "hidden_test_files": [],
+      "test_command": "defects4j test",
+      "visible_test_command": "defects4j test",
+      "hidden_test_command": "defects4j test",
+      "metadata": {
+        "task_id": "defects4j_Lang_3",
+        "project": "Lang",
+        "bug_id": 3,
+        "issue": "Fix Defects4J bug Lang-3. Use Defects4J triggering tests and project tests to validate the patch.",
+        "workspace": "outputs/defects4j_workspaces/defects4j_Lang_3",
+        "visible_test_command": "defects4j test",
+        "hidden_test_command": "defects4j test",
+        "source_files": [],
+        "allowed_files": [],
+        "metadata": {
+          "defects4j_project": "Lang",
+          "defects4j_bug_id": 3,
+          "requires_defects4j": true,
+          "recommended_setup": [
+            "java11",
+            "git",
+            "svn",
+            "perl",
+            "cpanm"
+          ]
+        }
+      }
+    }
+  ]
+}
