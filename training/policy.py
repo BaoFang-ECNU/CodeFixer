@@ -201,14 +201,25 @@ class LLMPolicy(Policy):
         endpoint = llm_config.get("endpoint")
         if not endpoint:
             return ActionProposal("final_answer", {}, "Local LLM endpoint is not configured; LLMPolicy produced a safe no-op.")
-        body = {"prompt": prompt, "temperature": llm_config.get("temperature", 0.0), "max_tokens": llm_config.get("max_tokens", 800)}
+        if llm_config.get("api_type") == "openai_compatible" or str(endpoint).endswith("/v1/chat/completions"):
+            body = {
+                "model": llm_config.get("model", "local-code-model"),
+                "messages": [{"role": "user", "content": prompt}],
+                "temperature": llm_config.get("temperature", 0.0),
+                "max_tokens": llm_config.get("max_tokens", 800),
+            }
+        else:
+            body = {"prompt": prompt, "temperature": llm_config.get("temperature", 0.0), "max_tokens": llm_config.get("max_tokens", 800)}
         request = urllib.request.Request(endpoint, data=json.dumps(body).encode("utf-8"), headers={"Content-Type": "application/json"}, method="POST")
         try:
             with urllib.request.urlopen(request, timeout=30) as response:
                 data = json.loads(response.read().decode("utf-8"))
-            content = data.get("content") or data.get("response") or data.get("text") or json.dumps(data)
+            if "choices" in data:
+                content = data["choices"][0]["message"]["content"]
+            else:
+                content = data.get("content") or data.get("response") or data.get("text") or json.dumps(data)
             return self._parse_action(content)
-        except (urllib.error.URLError, json.JSONDecodeError) as exc:
+        except (urllib.error.URLError, KeyError, json.JSONDecodeError) as exc:
             return ActionProposal("final_answer", {}, f"Local LLM request failed safely: {exc}")
 
     def _parse_action(self, content: str) -> ActionProposal:
