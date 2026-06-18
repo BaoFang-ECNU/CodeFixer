@@ -10,6 +10,7 @@ from agent.base import AgentResult, BaseAgent
 from agent.memory import Memory
 from agent.tools import ToolRegistry
 from env.code_env import CodeRepairEnv
+from training.guidance import GuidanceGenerator
 from training.policy import Policy, RuleBasedPolicy
 from training.reward import RewardModel
 from training.trajectory import Trajectory, TrajectoryStep, utc_now
@@ -29,6 +30,7 @@ class CodingAgent(BaseAgent):
         observation = env.reset()
         tools = ToolRegistry(env)
         trajectory = Trajectory(env.task.task_id)
+        guidance_generator = GuidanceGenerator()
         previous_failed = True
         final_answer = ""
         timed_out = False
@@ -72,6 +74,20 @@ class CodingAgent(BaseAgent):
                 previous_failed=previous_failed,
             )
             done = bool(test_result and test_result.passed)
+            guidance_enabled = config.get("training", {}).get("guidance", {}).get("enabled", True)
+            guidance = (
+                guidance_generator.generate(
+                    observation=observation,
+                    action=proposal.action,
+                    test_output=test_result.output if test_result else str(tool_output),
+                    reward=reward.total,
+                    done=done,
+                    patch_diff=env.get_diff(count_tool=False),
+                    unsafe_edits=env.unsafe_edits,
+                )
+                if guidance_enabled
+                else {}
+            )
             if done and first_pass_step is None:
                 first_pass_step = step_id
             if test_result:
@@ -89,6 +105,8 @@ class CodingAgent(BaseAgent):
                     done=done,
                     patch_diff=env.get_diff(count_tool=False),
                     timestamp=utc_now(),
+                    reward_breakdown=reward.__dict__ if config.get("evaluation", {}).get("record_reward_breakdown", True) else None,
+                    guidance=guidance,
                 )
             )
             if done:
@@ -99,7 +117,7 @@ class CodingAgent(BaseAgent):
             trajectory.save_jsonl(trajectory_path, append=True)
 
         patch_diff = env.get_diff(count_tool=False)
-        hidden_result = env.run_hidden_tests()
+        hidden_result = env.run_hidden_tests() if config.get("evaluation", {}).get("run_hidden_tests", True) else None
         runtime = time.perf_counter() - started
         system_version = config.get("system_version", config.get("evaluation", {}).get("system_version", "feedback"))
         return AgentResult(
