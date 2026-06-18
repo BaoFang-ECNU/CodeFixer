@@ -61,6 +61,8 @@ class RuleBasedPolicy(Policy):
         issue_and_output = f"{observation.get('issue', '')}\n{observation.get('last_test_output', '')}".lower()
         if ("off-by-one" in issue_and_output or "inclusive" in issue_and_output or "upper bound" in issue_and_output) and "range(1, n)" in content:
             return ActionProposal("edit_file", {"path": path, "old_text": "range(1, n)", "new_text": "range(1, n + 1)"}, "Make the upper bound inclusive.")
+        if ("off-by-one" in issue_and_output or "inclusive" in issue_and_output or "upper bound" in issue_and_output) and "i < n" in content:
+            return ActionProposal("edit_file", {"path": path, "old_text": "i < n", "new_text": "i <= n"}, "Make the JavaScript loop upper bound inclusive.")
 
         if ("division by zero" in issue_and_output or "empty" in issue_and_output) and "return sum(values) / len(values)" in content:
             return ActionProposal(
@@ -68,14 +70,32 @@ class RuleBasedPolicy(Policy):
                 {"path": path, "old_text": "return sum(values) / len(values)", "new_text": "if not values:\n        return 0.0\n    return sum(values) / len(values)"},
                 "Guard empty input before division.",
             )
+        if ("division by zero" in issue_and_output or "empty" in issue_and_output) and "return values.reduce((total, value) => total + value, 0) / values.length;" in content:
+            return ActionProposal(
+                "edit_file",
+                {
+                    "path": path,
+                    "old_text": "return values.reduce((total, value) => total + value, 0) / values.length;",
+                    "new_text": "if (values.length === 0) return 0;\n  return values.reduce((total, value) => total + value, 0) / values.length;",
+                },
+                "Guard empty arrays before averaging.",
+            )
 
         if ("descending" in issue_and_output or "highest" in issue_and_output or "lowest" in issue_and_output) and re.search(r"sorted\(([^)]*)\)\[:k\]", content):
             return ActionProposal("edit_file", {"path": path, "old_text": "sorted(scores)[:k]", "new_text": "sorted(scores, reverse=True)[:k]"}, "Sort scores descending before slicing.")
+        if ("descending" in issue_and_output or "highest" in issue_and_output or "lowest" in issue_and_output) and "sort((a, b) => a - b)" in content:
+            return ActionProposal("edit_file", {"path": path, "old_text": "sort((a, b) => a - b)", "new_text": "sort((a, b) => b - a)"}, "Sort numeric scores descending.")
 
         if ("strip" in issue_and_output or "whitespace" in issue_and_output or "normalize" in issue_and_output) and "return name.lower()" in content:
             return ActionProposal("edit_file", {"path": path, "old_text": "return name.lower()", "new_text": "return name.strip().lower()"}, "Strip whitespace before lowercasing.")
         if ("strip" in issue_and_output or "whitespace" in issue_and_output or "normalize" in issue_and_output) and "return name.toLowerCase();" in content:
             return ActionProposal("edit_file", {"path": path, "old_text": "return name.toLowerCase();", "new_text": "return name.trim().toLowerCase();"}, "Trim whitespace before lowercasing.")
+        if ("case-insensitive" in issue_and_output or "case insensitive" in issue_and_output) and "return text.includes(keyword);" in content:
+            return ActionProposal(
+                "edit_file",
+                {"path": path, "old_text": "return text.includes(keyword);", "new_text": "return text.toLowerCase().includes(keyword.toLowerCase());"},
+                "Normalize both operands before keyword matching.",
+            )
 
         if ("empty" in issue_and_output or "none" in issue_and_output) and "return max(values)" in content:
             return ActionProposal("edit_file", {"path": path, "old_text": "return max(values)", "new_text": "if not values:\n        return None\n    return max(values)"}, "Guard empty input before max().")
@@ -98,6 +118,14 @@ class RuleBasedPolicy(Policy):
             )
         if ("invalid" in issue_and_output or "default" in issue_and_output or "nan" in issue_and_output) and "return Number.parseInt(text, 10);" in content:
             return ActionProposal("edit_file", {"path": path, "old_text": "return Number.parseInt(text, 10);", "new_text": "const value = Number.parseInt(text, 10);\n  return Number.isNaN(value) ? defaultValue : value;"}, "Return default when parseInt yields NaN.")
+
+        if ("age 18" in issue_and_output or "adult" in issue_and_output or "boundary" in issue_and_output) and "return age > 18" in content:
+            return ActionProposal("edit_file", {"path": path, "old_text": "return age > 18", "new_text": "return age >= 18"}, "Include the adult age boundary.")
+
+        if ("final element" in issue_and_output or "last item" in issue_and_output or "lastitem" in issue_and_output) and "return values[0]" in content:
+            replacement = "return values[-1]" if path.endswith(".py") else "return values[values.length - 1];"
+            old_text = "return values[0];" if "return values[0];" in content else "return values[0]"
+            return ActionProposal("edit_file", {"path": path, "old_text": old_text, "new_text": replacement}, "Return the final element instead of the first.")
 
         if "/ len(" in content and "if not" not in content and "ZeroDivisionError" in observation.get("last_test_output", ""):
             old_line = next((line.strip() for line in content.splitlines() if "/ len(" in line), "")
