@@ -27,7 +27,7 @@ def main() -> None:
     dataset_spec = get_dataset_spec(dataset)
     payload = {
         "status": "template_only",
-        "message": "本地不执行真实训练；请在服务器上使用这些配置和导出的 JSONL 数据启动 SFT/DPO/OPD/RLVR。",
+        "message": "本脚本只做服务器训练配置检查，不在本地启动真实训练；请在 4x4090 服务器上使用导出的 JSONL 数据启动 SFT/DPO/OPD/RWR/RLVR。",
         "target_model": target_model,
         "model_spec": model_spec,
         "dataset": dataset,
@@ -41,11 +41,19 @@ def main() -> None:
             "training/guidance_train.jsonl",
         ],
         "server_steps": [
-            "1. 将 JSONL 数据同步到训练服务器。",
-            "2. 启动 Qwen2.5-Coder-7B 的 SFT 训练。",
-            "3. 用 DPO chosen/rejected 数据进行偏好学习。",
-            "4. 用 OPD/RWR/RLVR 数据做后续策略改进实验。",
-            "5. 回到 CodeFixer 运行 SWE-bench Lite/Verified 评测。",
+            "1. 使用 Qwen3-30B 作为教师模型生成 SWE-bench Lite rollouts。",
+            "2. 将 SFT/DPO/OPD/RWR/RLVR JSONL 数据同步到训练服务器。",
+            "3. 对 Qwen2.5-Coder-7B 或同级学生模型执行 LoRA/QLoRA SFT。",
+            "4. 使用 DPO chosen/rejected 数据做偏好学习。",
+            "5. 使用 OPD/RWR/RLVR 数据做后续策略改进实验。",
+            "6. 回到 CodeFixer 运行 Defects4J、SWE-bench Verified 或 holdout 评测。",
+        ],
+        "suggested_commands": [
+            "python scripts/prepare_swebench_lite.py --source hf --split train --max-instances 50",
+            "python scripts/export_training_data.py --config configs/training_pipeline_swebench.yaml",
+            "python scripts/prepare_defects4j.py --projects Lang,Chart,Math --max-bugs 10 --check-env",
+            "python -m evaluation.compare_systems --config configs/final_eval.yaml",
+            "python scripts/summarize_final_experiment.py --root outputs/final_experiments",
         ],
     }
     print(json.dumps(payload, ensure_ascii=False, indent=2))
@@ -53,3 +61,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
