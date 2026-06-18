@@ -1,0 +1,51 @@
+models:
+  local_rule_based:
+    display_name: Local RuleBasedPolicy
+    role: local_smoke_test
+    provider: internal
+    policy_type: rule_based
+    endpoint: ""
+    model_name: rule_based
+    max_tokens: 0
+    temperature: 0.0
+    server_only: false
+    notes: "No network or GPU required. Used to verify the CodeFixer pipeline locally."
+
+  qwen2_5_coder_7b:
+    display_name: Qwen2.5-Coder-7B-Instruct
+    role: target_trainable_repair_model
+    provider: local_openai_compatible
+    policy_type: llm
+    endpoint: "http://127.0.0.1:8000/v1/chat/completions"
+    model_name: "Qwen/Qwen2.5-Coder-7B-Instruct"
+    max_tokens: 1024
+    temperature: 0.0
+    api_key_env: "OPENAI_API_KEY"
+    server_only: true
+    notes: "Main 7B model for SFT/DPO/OPD/RLVR experiments on the training server."
+
+  qwen3_coder_30b_a3b_vllm:
+    display_name: Qwen3-Coder-30B-A3B-Instruct via vLLM
+    role: strong_server_baseline
+    provider: local_openai_compatible
+    policy_type: llm
+    endpoint: "http://127.0.0.1:8001/v1/chat/completions"
+    model_name: "qwen3-coder-30b-a3b"
+    max_tokens: 1024
+    temperature: 0.0
+    api_key_env: "OPENAI_API_KEY"
+    server_only: true
+    notes: "Baseline model used by the ytc branch with mini-SWE-agent and local vLLM."
+
+  openai_gpt_4_1_mini:
+    display_name: GPT-4.1 mini
+    role: optional_teacher_or_debug_model
+    provider: openai
+    policy_type: llm
+    endpoint: "https://api.openai.com/v1/chat/completions"
+    model_name: "gpt-4.1-mini"
+    max_tokens: 800
+    temperature: 0.0
+    api_key_env: "OPENAI_API_KEY"
+    server_only: false
+    notes: "Optional teacher/debug model. Disabled unless an API key is provided."
