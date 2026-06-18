@@ -18,3 +18,9 @@ def test_apply_resource_selection_builds_runnable_config():
     assert merged["policy"]["type"] == "rule_based"
     assert merged["selected_resources"]["dataset_name"] == "codefixer_toy"
     assert merged["selected_resources"]["model_name"] == "local_rule_based"
+
+
+def test_registry_contains_final_experiment_resources():
+    registry = load_registry()
+    assert "qwen3_coder_30b_a3b_vllm" in registry["models"]
+    assert "defects4j_active" in registry["datasets"]
