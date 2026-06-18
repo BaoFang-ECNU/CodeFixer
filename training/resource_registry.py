@@ -65,6 +65,7 @@ def apply_resource_selection(config: dict[str, Any], dataset_name: str | None = 
         provider = "openai" if model.get("provider") == "openai" else "local"
         config["llm"] = {
             "provider": provider,
+            "api_type": model.get("api_type", "openai_compatible" if model.get("provider") == "local_openai_compatible" else provider),
             "model": model.get("model_name", model_key),
             "endpoint": model.get("endpoint", ""),
             "max_tokens": int(model.get("max_tokens", 800)),
