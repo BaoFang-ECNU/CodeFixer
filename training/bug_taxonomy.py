@@ -33,6 +33,9 @@ class BugTaxonomy:
         ("dynamic_programming_transition", ["fibonacci", "dynamic programming", "transition", "dp[-1] + dp[-1]"], ["inspect_file", "edit_file", "run_tests"]),
         ("counting_update", ["count", "duplicate", "counts[word] = 1"], ["inspect_file", "edit_file", "run_tests"]),
         ("exception_handling", ["ValueError", "invalid", "default", "try", "except"], ["inspect_file", "edit_file", "run_tests"]),
+        ("boundary_condition", ["age 18", "adult", "boundary", ">= 18", "> 18"], ["inspect_file", "edit_file", "run_tests"]),
+        ("indexing_error", ["final element", "last item", "lastitem", "values[0]"], ["inspect_file", "edit_file", "run_tests"]),
+        ("case_insensitive_match", ["case-insensitive", "case insensitive", "includes(keyword)", "tolowercase"], ["inspect_file", "edit_file", "run_tests"]),
     ]
 
     def diagnose(self, observation: dict[str, Any]) -> BugDiagnosis:
@@ -67,4 +70,3 @@ class BugTaxonomy:
         if "hardcode" in text_lower or "hard-code" in text_lower:
             flags.append("possible_hardcoding")
         return flags
-
