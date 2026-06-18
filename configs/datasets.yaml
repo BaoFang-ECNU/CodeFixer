@@ -24,7 +24,7 @@ datasets:
   swebench_lite:
     display_name: SWE-bench Lite
     hf_dataset: "princeton-nlp/SWE-bench_Lite"
-    task_file: "configs/tasks_swebench_sample.yaml"
+    task_file: "configs/tasks_swebench_lite_train.yaml"
     local_available: false
     server_only: true
     task_format: swebench
@@ -32,6 +32,17 @@ datasets:
     scale: 300
     usage: "main repository-level evaluation; keep as evaluation data"
     notes: "Requires cloning repositories and official/containerized or server-side execution."
+
+  defects4j_active:
+    display_name: Defects4J Active Bugs
+    task_file: "configs/tasks_defects4j.yaml"
+    local_available: false
+    server_only: true
+    task_format: defects4j
+    language: java
+    scale: 854
+    usage: "final Java cross-language evaluation; do not mix into SWE-bench Lite training by default"
+    notes: "Requires Linux server setup with Java 11, Git, SVN, Perl, cpanm, and Defects4J."
 
   swebench_verified:
     display_name: SWE-bench Verified
