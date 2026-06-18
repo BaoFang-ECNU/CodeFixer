@@ -1,0 +1,36 @@
+project:
+  name: CodeFixerLocalMiniTest
+  seed: 7
+
+resource_selection:
+  dataset: codefixer_toy
+  model: local_rule_based
+  max_tasks: 2
+
+paths:
+  logs_dir: "outputs/local_mini_test/logs"
+  workspaces_dir: "outputs/local_mini_test/workspaces"
+  results_file: "outputs/local_mini_test/results.json"
+  summary_file: "outputs/local_mini_test/summary.md"
+  trajectory_file: "outputs/local_mini_test/trajectory.jsonl"
+  replay_file: "outputs/local_mini_test/replay_buffer.jsonl"
+
+agent:
+  max_steps: 6
+  use_memory: true
+  use_test_feedback: true
+  use_self_evolution: true
+
+orchestrator:
+  mode: single_agent
+
+environment:
+  test_timeout_sec: 20
+  allowed_edit_globs: ["*.py"]
+  unsafe_edit_globs: ["test_*.py"]
+
+evaluation:
+  system_version: feedback
+  pass_at_k: 2
+  trials_per_task: 1
+  cost_per_tool_call: 0.001
