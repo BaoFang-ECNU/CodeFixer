@@ -1,0 +1,85 @@
+datasets:
+  codefixer_toy:
+    display_name: CodeFixer Toy Tasks
+    task_file: "configs/tasks_toy.yaml"
+    local_available: true
+    server_only: false
+    task_format: codefixer_yaml
+    language: python
+    scale: 8
+    usage: "local smoke tests, unit tests, debugging repair loop"
+    notes: "Small deterministic Python repair tasks that should run on any laptop."
+
+  codefixer_benchmark:
+    display_name: CodeFixer Lightweight Python/JavaScript Benchmark
+    task_file: "configs/tasks_benchmark.yaml"
+    local_available: true
+    server_only: false
+    task_format: codefixer_yaml
+    language: python_javascript
+    scale: 20
+    usage: "small benchmark, ablation, three-system comparison"
+    notes: "Self-contained micro repair tasks with visible and hidden tests."
+
+  swebench_lite:
+    display_name: SWE-bench Lite
+    hf_dataset: "princeton-nlp/SWE-bench_Lite"
+    task_file: "configs/tasks_swebench_sample.yaml"
+    local_available: false
+    server_only: true
+    task_format: swebench
+    language: python
+    scale: 300
+    usage: "main repository-level evaluation; keep as evaluation data"
+    notes: "Requires cloning repositories and official/containerized or server-side execution."
+
+  swebench_verified:
+    display_name: SWE-bench Verified
+    hf_dataset: "princeton-nlp/SWE-bench_Verified"
+    local_available: false
+    server_only: true
+    task_format: swebench
+    language: python
+    scale: 500
+    usage: "final high-quality evaluation; avoid training contamination"
+    notes: "Use only for final validation unless a clean split is explicitly defined."
+
+  swe_gym:
+    display_name: SWE-Gym
+    local_available: false
+    server_only: true
+    task_format: swe_agent_training_env
+    language: python
+    scale: 2438
+    usage: "server-side agent training and verifier training"
+    notes: "Good fit for Agent-RLVR style experiments."
+
+  swe_smith:
+    display_name: SWE-smith
+    local_available: false
+    server_only: true
+    task_format: synthetic_repo_repair
+    language: python
+    scale: "50k+"
+    usage: "large-scale synthetic repair training and self-play style data"
+    notes: "Useful for generating diverse verifiable repair tasks."
+
+  humanevalfix:
+    display_name: HumanEvalFix
+    local_available: false
+    server_only: true
+    task_format: single_file_repair
+    language: python_javascript_java
+    scale: "164 per language"
+    usage: "warm-up SFT for single-file repair"
+    notes: "Good early-stage dataset before repository-level training."
+
+  bugsinpy_quixbugs_defects4j:
+    display_name: BugsInPy / QuixBugs / Defects4J
+    local_available: false
+    server_only: true
+    task_format: apr_benchmark
+    language: python_java
+    scale: mixed
+    usage: "additional APR-style repair data"
+    notes: "Useful for broadening bug types, but needs adapters."
