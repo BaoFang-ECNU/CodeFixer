@@ -145,6 +145,102 @@
       "hidden_test_command": "python -m pytest test_hidden.py"
     },
     {
+      "task_id": "bench_py_007",
+      "language": "python",
+      "project_source": "open-source-style-micro-benchmark",
+      "construction": "manual_injection",
+      "bug_type": "empty_boundary",
+      "difficulty": "easy",
+      "issue": "examples/benchmark_tasks/bench_py_007/issue.md",
+      "source_files": [
+        "examples/benchmark_tasks/bench_py_007/buggy_code.py"
+      ],
+      "allowed_files": [
+        "examples/benchmark_tasks/bench_py_007/buggy_code.py"
+      ],
+      "test_files": [
+        "examples/benchmark_tasks/bench_py_007/test_visible.py"
+      ],
+      "hidden_test_files": [
+        "examples/benchmark_tasks/bench_py_007/test_hidden.py"
+      ],
+      "test_command": "python -m pytest test_visible.py",
+      "visible_test_command": "python -m pytest test_visible.py",
+      "hidden_test_command": "python -m pytest test_hidden.py"
+    },
+    {
+      "task_id": "bench_py_008",
+      "language": "python",
+      "project_source": "open-source-style-micro-benchmark",
+      "construction": "manual_injection",
+      "bug_type": "exception_handling",
+      "difficulty": "easy",
+      "issue": "examples/benchmark_tasks/bench_py_008/issue.md",
+      "source_files": [
+        "examples/benchmark_tasks/bench_py_008/buggy_code.py"
+      ],
+      "allowed_files": [
+        "examples/benchmark_tasks/bench_py_008/buggy_code.py"
+      ],
+      "test_files": [
+        "examples/benchmark_tasks/bench_py_008/test_visible.py"
+      ],
+      "hidden_test_files": [
+        "examples/benchmark_tasks/bench_py_008/test_hidden.py"
+      ],
+      "test_command": "python -m pytest test_visible.py",
+      "visible_test_command": "python -m pytest test_visible.py",
+      "hidden_test_command": "python -m pytest test_hidden.py"
+    },
+    {
+      "task_id": "bench_py_009",
+      "language": "python",
+      "project_source": "open-source-style-micro-benchmark",
+      "construction": "manual_injection",
+      "bug_type": "boundary_condition",
+      "difficulty": "easy",
+      "issue": "examples/benchmark_tasks/bench_py_009/issue.md",
+      "source_files": [
+        "examples/benchmark_tasks/bench_py_009/buggy_code.py"
+      ],
+      "allowed_files": [
+        "examples/benchmark_tasks/bench_py_009/buggy_code.py"
+      ],
+      "test_files": [
+        "examples/benchmark_tasks/bench_py_009/test_visible.py"
+      ],
+      "hidden_test_files": [
+        "examples/benchmark_tasks/bench_py_009/test_hidden.py"
+      ],
+      "test_command": "python -m pytest test_visible.py",
+      "visible_test_command": "python -m pytest test_visible.py",
+      "hidden_test_command": "python -m pytest test_hidden.py"
+    },
+    {
+      "task_id": "bench_py_010",
+      "language": "python",
+      "project_source": "open-source-style-micro-benchmark",
+      "construction": "manual_injection",
+      "bug_type": "indexing_error",
+      "difficulty": "easy",
+      "issue": "examples/benchmark_tasks/bench_py_010/issue.md",
+      "source_files": [
+        "examples/benchmark_tasks/bench_py_010/buggy_code.py"
+      ],
+      "allowed_files": [
+        "examples/benchmark_tasks/bench_py_010/buggy_code.py"
+      ],
+      "test_files": [
+        "examples/benchmark_tasks/bench_py_010/test_visible.py"
+      ],
+      "hidden_test_files": [
+        "examples/benchmark_tasks/bench_py_010/test_hidden.py"
+      ],
+      "test_command": "python -m pytest test_visible.py",
+      "visible_test_command": "python -m pytest test_visible.py",
+      "hidden_test_command": "python -m pytest test_hidden.py"
+    },
+    {
       "task_id": "bench_js_001",
       "language": "javascript",
       "project_source": "open-source-style-micro-benchmark",
@@ -235,6 +331,150 @@
       ],
       "hidden_test_files": [
         "examples/benchmark_tasks/bench_js_004/test_hidden.js"
+      ],
+      "test_command": "node test_visible.js",
+      "visible_test_command": "node test_visible.js",
+      "hidden_test_command": "node test_hidden.js"
+    },
+    {
+      "task_id": "bench_js_005",
+      "language": "javascript",
+      "project_source": "open-source-style-micro-benchmark",
+      "construction": "manual_injection",
+      "bug_type": "off_by_one",
+      "difficulty": "easy",
+      "issue": "examples/benchmark_tasks/bench_js_005/issue.md",
+      "source_files": [
+        "examples/benchmark_tasks/bench_js_005/buggy_code.js"
+      ],
+      "allowed_files": [
+        "examples/benchmark_tasks/bench_js_005/buggy_code.js"
+      ],
+      "test_files": [
+        "examples/benchmark_tasks/bench_js_005/test_visible.js"
+      ],
+      "hidden_test_files": [
+        "examples/benchmark_tasks/bench_js_005/test_hidden.js"
+      ],
+      "test_command": "node test_visible.js",
+      "visible_test_command": "node test_visible.js",
+      "hidden_test_command": "node test_hidden.js"
+    },
+    {
+      "task_id": "bench_js_006",
+      "language": "javascript",
+      "project_source": "open-source-style-micro-benchmark",
+      "construction": "manual_injection",
+      "bug_type": "sorting_direction",
+      "difficulty": "easy",
+      "issue": "examples/benchmark_tasks/bench_js_006/issue.md",
+      "source_files": [
+        "examples/benchmark_tasks/bench_js_006/buggy_code.js"
+      ],
+      "allowed_files": [
+        "examples/benchmark_tasks/bench_js_006/buggy_code.js"
+      ],
+      "test_files": [
+        "examples/benchmark_tasks/bench_js_006/test_visible.js"
+      ],
+      "hidden_test_files": [
+        "examples/benchmark_tasks/bench_js_006/test_hidden.js"
+      ],
+      "test_command": "node test_visible.js",
+      "visible_test_command": "node test_visible.js",
+      "hidden_test_command": "node test_hidden.js"
+    },
+    {
+      "task_id": "bench_js_007",
+      "language": "javascript",
+      "project_source": "open-source-style-micro-benchmark",
+      "construction": "manual_injection",
+      "bug_type": "division_by_zero",
+      "difficulty": "easy",
+      "issue": "examples/benchmark_tasks/bench_js_007/issue.md",
+      "source_files": [
+        "examples/benchmark_tasks/bench_js_007/buggy_code.js"
+      ],
+      "allowed_files": [
+        "examples/benchmark_tasks/bench_js_007/buggy_code.js"
+      ],
+      "test_files": [
+        "examples/benchmark_tasks/bench_js_007/test_visible.js"
+      ],
+      "hidden_test_files": [
+        "examples/benchmark_tasks/bench_js_007/test_hidden.js"
+      ],
+      "test_command": "node test_visible.js",
+      "visible_test_command": "node test_visible.js",
+      "hidden_test_command": "node test_hidden.js"
+    },
+    {
+      "task_id": "bench_js_008",
+      "language": "javascript",
+      "project_source": "open-source-style-micro-benchmark",
+      "construction": "manual_injection",
+      "bug_type": "boundary_condition",
+      "difficulty": "easy",
+      "issue": "examples/benchmark_tasks/bench_js_008/issue.md",
+      "source_files": [
+        "examples/benchmark_tasks/bench_js_008/buggy_code.js"
+      ],
+      "allowed_files": [
+        "examples/benchmark_tasks/bench_js_008/buggy_code.js"
+      ],
+      "test_files": [
+        "examples/benchmark_tasks/bench_js_008/test_visible.js"
+      ],
+      "hidden_test_files": [
+        "examples/benchmark_tasks/bench_js_008/test_hidden.js"
+      ],
+      "test_command": "node test_visible.js",
+      "visible_test_command": "node test_visible.js",
+      "hidden_test_command": "node test_hidden.js"
+    },
+    {
+      "task_id": "bench_js_009",
+      "language": "javascript",
+      "project_source": "open-source-style-micro-benchmark",
+      "construction": "manual_injection",
+      "bug_type": "indexing_error",
+      "difficulty": "easy",
+      "issue": "examples/benchmark_tasks/bench_js_009/issue.md",
+      "source_files": [
+        "examples/benchmark_tasks/bench_js_009/buggy_code.js"
+      ],
+      "allowed_files": [
+        "examples/benchmark_tasks/bench_js_009/buggy_code.js"
+      ],
+      "test_files": [
+        "examples/benchmark_tasks/bench_js_009/test_visible.js"
+      ],
+      "hidden_test_files": [
+        "examples/benchmark_tasks/bench_js_009/test_hidden.js"
+      ],
+      "test_command": "node test_visible.js",
+      "visible_test_command": "node test_visible.js",
+      "hidden_test_command": "node test_hidden.js"
+    },
+    {
+      "task_id": "bench_js_010",
+      "language": "javascript",
+      "project_source": "open-source-style-micro-benchmark",
+      "construction": "manual_injection",
+      "bug_type": "string_normalization",
+      "difficulty": "easy",
+      "issue": "examples/benchmark_tasks/bench_js_010/issue.md",
+      "source_files": [
+        "examples/benchmark_tasks/bench_js_010/buggy_code.js"
+      ],
+      "allowed_files": [
+        "examples/benchmark_tasks/bench_js_010/buggy_code.js"
+      ],
+      "test_files": [
+        "examples/benchmark_tasks/bench_js_010/test_visible.js"
+      ],
+      "hidden_test_files": [
+        "examples/benchmark_tasks/bench_js_010/test_hidden.js"
       ],
       "test_command": "node test_visible.js",
       "visible_test_command": "node test_visible.js",
