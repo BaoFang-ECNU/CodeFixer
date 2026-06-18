@@ -1,0 +1,57 @@
+project:
+  name: CodeFixerTrainingPipeline
+  seed: 7
+
+resource_selection:
+  dataset: codefixer_toy
+  model: local_rule_based
+  max_tasks: 2
+
+paths:
+  logs_dir: "outputs/local_rl_smoke/logs"
+  workspaces_dir: "outputs/local_rl_smoke/workspaces"
+  results_file: "outputs/local_rl_smoke/results.json"
+  summary_file: "outputs/local_rl_smoke/summary.md"
+  trajectory_file: "outputs/local_rl_smoke/trajectory.jsonl"
+  replay_file: "outputs/local_rl_smoke/replay_buffer.jsonl"
+  training_output_dir: "outputs/local_rl_smoke/training"
+
+agent:
+  max_steps: 6
+  use_memory: true
+  use_test_feedback: true
+  use_self_evolution: true
+
+orchestrator:
+  mode: single_agent
+
+environment:
+  test_timeout_sec: 20
+  allowed_edit_globs: ["*.py"]
+  unsafe_edit_globs: ["test_*.py"]
+
+evaluation:
+  system_version: feedback
+  pass_at_k: 2
+  trials_per_task: 1
+  cost_per_tool_call: 0.001
+
+training:
+  mode: export_only
+  target_model: qwen2_5_coder_7b
+  dataset: codefixer_toy
+  max_tasks: 2
+  methods:
+    sft: true
+    dpo: true
+    opd: true
+    rwr: true
+    rlvr: true
+  guidance:
+    enabled: true
+    source: rule_based
+  reward:
+    use_visible_tests: true
+    use_hidden_tests: true
+    patch_size_penalty: true
+    unsafe_edit_penalty: true
