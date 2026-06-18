@@ -1,0 +1,68 @@
+project:
+  name: CodeFixerSWEBenchTrainingPipeline
+  seed: 7
+
+resource_selection:
+  dataset: swebench_lite
+  model: qwen3_coder_30b_a3b_vllm
+  max_tasks: 50
+
+paths:
+  logs_dir: "outputs/swebench_lite_train/logs"
+  workspaces_dir: "outputs/swebench_lite_train/workspaces"
+  results_file: "outputs/swebench_lite_train/results.json"
+  summary_file: "outputs/swebench_lite_train/summary.md"
+  trajectory_file: "outputs/swebench_lite_train/trajectory.jsonl"
+  replay_file: "outputs/swebench_lite_train/replay_buffer.jsonl"
+  training_output_dir: "outputs/swebench_lite_train/training"
+
+agent:
+  max_steps: 8
+  use_memory: true
+  use_test_feedback: true
+  use_self_evolution: true
+
+orchestrator:
+  mode: multi_agent
+
+environment:
+  test_timeout_sec: 300
+  allowed_edit_globs: ["*.py"]
+  unsafe_edit_globs: ["test_*.py", "tests/*.py"]
+
+evaluation:
+  system_version: learning
+  pass_at_k: 3
+  trials_per_task: 1
+  cost_per_tool_call: 0.0
+  output_dir: "outputs/swebench_lite_train"
+  record_reward_breakdown: true
+  run_hidden_tests: true
+
+training:
+  mode: export_only
+  target_model: qwen2_5_coder_7b
+  dataset: swebench_lite
+  max_tasks: 50
+  methods:
+    sft: true
+    dpo: true
+    opd: true
+    rwr: true
+    rlvr: true
+  guidance:
+    enabled: true
+    source: qwen3_teacher
+  reward:
+    use_visible_tests: true
+    use_hidden_tests: true
+    patch_size_penalty: true
+    unsafe_edit_penalty: true
+
+evolution:
+  export_sft: true
+  export_dpo_opd: true
+  export_rwr: true
+  export_rlvr: true
+  export_guidance: true
+
