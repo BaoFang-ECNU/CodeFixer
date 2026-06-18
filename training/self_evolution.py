@@ -9,6 +9,7 @@ from typing import Any
 
 from agent.memory import Memory
 from training.dpo_data import export_dpo_pairs
+from training.guidance import GuidanceGenerator
 from training.opd import export_opd_records
 
 
@@ -18,19 +19,29 @@ class SelfEvolutionTrainer:
     def __init__(self, memory: Memory | None = None):
         self.memory = memory or Memory()
 
-    def evolve(self, trajectories: list[dict[str, Any]], output_dir: str | Path = "training", logs_dir: str | Path = "logs") -> dict[str, Any]:
+    def evolve(
+        self,
+        trajectories: list[dict[str, Any]],
+        output_dir: str | Path = "training",
+        logs_dir: str | Path = "logs",
+        export_options: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
         output_dir = Path(output_dir)
         logs_dir = Path(logs_dir)
         output_dir.mkdir(parents=True, exist_ok=True)
         logs_dir.mkdir(parents=True, exist_ok=True)
+        export_options = export_options or {}
+        self._clear_training_artifacts(output_dir)
 
         successes = [t for t in trajectories if t.get("success")]
         failures = [t for t in trajectories if not t.get("success")]
         action_counter: Counter[str] = Counter()
+        action_success_counter: Counter[str] = Counter()
         rationale_counter: Counter[str] = Counter()
         bug_counter: Counter[str] = Counter()
         bug_success_counter: Counter[str] = Counter()
         failure_reasons: Counter[str] = Counter()
+        guidance_generator = GuidanceGenerator()
 
         for traj in trajectories:
             last_action = ""
@@ -42,6 +53,8 @@ class SelfEvolutionTrainer:
                 action = step.get("action", "")
                 last_action = action
                 action_counter[action] += 1
+                if traj.get("success"):
+                    action_success_counter[action] += 1
                 rationale = step.get("action_args", {}).get("rationale", "")
                 if rationale:
                     rationale_counter[rationale] += 1
@@ -53,6 +66,9 @@ class SelfEvolutionTrainer:
 
         dpo_pairs = self._make_dpo_pairs(successes, failures)
         opd_records = self._make_opd_records(successes)
+        sft_records = self._make_sft_records(successes)
+        guidance_records = self._make_guidance_records(trajectories, guidance_generator)
+        rlvr_records = self._make_rlvr_records(trajectories)
         evolved_policy = {
             "preferred_actions": [name for name, _ in action_counter.most_common()],
             "learned_bug_patterns": [name for name, _ in rationale_counter.most_common(10)],
@@ -62,19 +78,32 @@ class SelfEvolutionTrainer:
                 bug_type: round(bug_success_counter[bug_type] / count, 4)
                 for bug_type, count in bug_counter.items()
             },
+            "action_pattern_success_rate": {
+                action: round(action_success_counter[action] / count, 4)
+                for action, count in action_counter.items()
+            },
             "memory": self.memory.to_dict(),
         }
 
         (output_dir / "evolved_policy.json").write_text(json.dumps(evolved_policy, indent=2, ensure_ascii=False), encoding="utf-8")
         (output_dir / "memory_patterns.json").write_text(json.dumps(evolved_policy["bug_type_success_rate"], indent=2, ensure_ascii=False), encoding="utf-8")
-        export_dpo_pairs(dpo_pairs, output_dir / "dpo_data.jsonl")
-        export_dpo_pairs(dpo_pairs, output_dir / "dpo_train.jsonl")
-        export_opd_records(opd_records, output_dir / "opd_distill.jsonl")
-        export_opd_records(opd_records, output_dir / "opd_train.jsonl")
-        self._export_rwr(trajectories, output_dir / "rwr_train.jsonl")
+        if export_options.get("export_sft", True):
+            self._write_jsonl(sft_records, output_dir / "sft_train.jsonl")
+        if export_options.get("export_dpo_opd", True):
+            export_dpo_pairs(dpo_pairs, output_dir / "dpo_data.jsonl")
+            export_dpo_pairs(dpo_pairs, output_dir / "dpo_train.jsonl")
+            export_opd_records(opd_records, output_dir / "opd_distill.jsonl")
+            export_opd_records(opd_records, output_dir / "opd_train.jsonl")
+        if export_options.get("export_rwr", True):
+            self._export_rwr(trajectories, output_dir / "rwr_train.jsonl")
+        if export_options.get("export_rlvr", True):
+            self._write_jsonl(rlvr_records, output_dir / "rlvr_rollouts.jsonl")
+        if export_options.get("export_guidance", True):
+            self._write_jsonl(guidance_records, output_dir / "guidance_train.jsonl")
         summary = self._summary_markdown(evolved_policy, failure_reasons)
         (logs_dir / "evolution_summary.md").write_text(summary, encoding="utf-8")
         (logs_dir / "bug_taxonomy_summary.md").write_text(self._bug_summary(evolved_policy), encoding="utf-8")
+        (output_dir / "evolution_report.md").write_text(self._evolution_report(evolved_policy, failure_reasons), encoding="utf-8")
         return evolved_policy
 
     @staticmethod
@@ -156,6 +185,77 @@ class SelfEvolutionTrainer:
         return records
 
     @staticmethod
+    def _make_sft_records(successes: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        records: list[dict[str, Any]] = []
+        for traj in successes:
+            for step in traj.get("steps", []):
+                records.append(
+                    {
+                        "instruction": "你是代码修复 Agent，请根据当前观察选择下一步工具动作。",
+                        "input": {
+                            "task_id": step.get("task_id") or traj.get("task_id"),
+                            "agent_role": step.get("agent_role", "repairer"),
+                            "graph_node": step.get("graph_node", "repair"),
+                            "observation": step.get("observation", {}),
+                        },
+                        "output": {
+                            "action": step.get("action"),
+                            "args": step.get("action_args", {}),
+                            "rationale": step.get("action_args", {}).get("rationale", ""),
+                        },
+                        "reward": step.get("reward", 0),
+                    }
+                )
+        return records
+
+    @staticmethod
+    def _make_guidance_records(trajectories: list[dict[str, Any]], generator: GuidanceGenerator) -> list[dict[str, Any]]:
+        records: list[dict[str, Any]] = []
+        for traj in trajectories:
+            for step in traj.get("steps", []):
+                guidance = step.get("guidance") or generator.generate(
+                    observation=step.get("observation", {}),
+                    action=step.get("action", ""),
+                    test_output=step.get("test_output", ""),
+                    reward=float(step.get("reward", 0)),
+                    done=bool(step.get("done")),
+                    patch_diff=step.get("patch_diff", ""),
+                    unsafe_edits=int(step.get("observation", {}).get("unsafe_edits", 0) or 0),
+                )
+                records.append(
+                    {
+                        "task_id": step.get("task_id") or traj.get("task_id"),
+                        "prompt": step.get("observation", {}).get("issue", ""),
+                        "observation": step.get("observation", {}),
+                        "action": step.get("action"),
+                        "reward": step.get("reward", 0),
+                        "passed": bool(step.get("done")),
+                        "guidance": guidance,
+                    }
+                )
+        return records
+
+    @staticmethod
+    def _make_rlvr_records(trajectories: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        records: list[dict[str, Any]] = []
+        for traj in trajectories:
+            steps = traj.get("steps", [])
+            last = steps[-1] if steps else {}
+            records.append(
+                {
+                    "task_id": traj.get("task_id"),
+                    "prompt": (steps[0].get("observation", {}).get("issue", "") if steps else ""),
+                    "trajectory": steps,
+                    "reward": traj.get("total_reward", sum(float(step.get("reward", 0)) for step in steps)),
+                    "passed": bool(traj.get("success")),
+                    "patch_diff": last.get("patch_diff", ""),
+                    "visible_passed": bool(last.get("done")),
+                    "guidance": last.get("guidance", {}),
+                }
+            )
+        return records
+
+    @staticmethod
     def _summary_markdown(evolved_policy: dict[str, Any], failure_reasons: Counter[str]) -> str:
         lines = [
             "# Evolution Summary",
@@ -190,6 +290,27 @@ class SelfEvolutionTrainer:
         path.write_text("\n".join(json.dumps(record, ensure_ascii=False) for record in records) + ("\n" if records else ""), encoding="utf-8")
 
     @staticmethod
+    def _write_jsonl(records: list[dict[str, Any]], path: Path) -> None:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("\n".join(json.dumps(record, ensure_ascii=False) for record in records) + ("\n" if records else ""), encoding="utf-8")
+
+    @staticmethod
+    def _clear_training_artifacts(output_dir: Path) -> None:
+        for name in (
+            "sft_train.jsonl",
+            "dpo_data.jsonl",
+            "dpo_train.jsonl",
+            "opd_distill.jsonl",
+            "opd_train.jsonl",
+            "rwr_train.jsonl",
+            "rlvr_rollouts.jsonl",
+            "guidance_train.jsonl",
+        ):
+            path = output_dir / name
+            if path.exists():
+                path.unlink()
+
+    @staticmethod
     def _bug_summary(evolved_policy: dict[str, Any]) -> str:
         lines = ["# Bug Taxonomy Summary", "", "| bug_type | success_rate |", "|---|---:|"]
         rates = evolved_policy.get("bug_type_success_rate", {})
@@ -198,4 +319,30 @@ class SelfEvolutionTrainer:
         else:
             for bug_type, rate in rates.items():
                 lines.append(f"| {bug_type} | {rate} |")
+        return "\n".join(lines) + "\n"
+
+    @staticmethod
+    def _evolution_report(evolved_policy: dict[str, Any], failure_reasons: Counter[str]) -> str:
+        lines = [
+            "# Evolution Report",
+            "",
+            "## Overview",
+            f"- Success trajectories: {evolved_policy['num_success']}",
+            f"- Failed trajectories: {evolved_policy['num_failure']}",
+            "",
+            "## Action Pattern Success Rate",
+            "",
+            "| action | success_rate |",
+            "|---|---:|",
+        ]
+        action_rates = evolved_policy.get("action_pattern_success_rate", {})
+        if action_rates:
+            lines.extend(f"| {action} | {rate} |" for action, rate in action_rates.items())
+        else:
+            lines.append("| none | 0 |")
+        lines.extend(["", "## Failure Reasons", ""])
+        if failure_reasons:
+            lines.extend(f"- {reason}: {count}" for reason, count in failure_reasons.items())
+        else:
+            lines.append("- none")
         return "\n".join(lines) + "\n"
