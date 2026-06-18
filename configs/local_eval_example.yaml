@@ -1,0 +1,32 @@
+# Example manifest for the no-Docker local evaluator.
+#
+# Create one or more lightweight code-repair tasks, then point attempts_dir to
+# agent outputs shaped as:
+#   outputs/local_runs/<system_name>/<task_id>/candidate_0/patch.diff
+#   outputs/local_runs/<system_name>/<task_id>/candidate_0/trajectory.json
+#   outputs/local_runs/<system_name>/<task_id>/candidate_0/metadata.json
+#
+# The evaluator copies each task repo to a temporary directory, applies the
+# patch, runs visible and hidden/regression commands, and computes the metrics
+# requested in section 6.3.
+
+systems:
+  - name: baseline
+    attempts_dir: outputs/local_runs/baseline
+    description: "vanilla mini-SWE-agent without structured feedback or learning"
+  - name: feedback
+    attempts_dir: outputs/local_runs/feedback
+    description: "+ Feedback"
+  - name: learning
+    attempts_dir: outputs/local_runs/learning
+    description: "+ Learning/Evolution"
+
+tasks:
+  - id: toy_add
+    repo_path: examples/local_tasks/toy_add/repo
+    issue: "Fix add(a, b) so it returns the numeric sum."
+    relevant_files:
+      - buggy_math.py
+    visible_test_command: "python -m pytest tests/test_visible.py -q"
+    hidden_test_command: "python -m pytest tests/test_hidden.py -q"
+    timeout_sec: 60

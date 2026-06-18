@@ -1,0 +1,38 @@
+# V0 baseline overrides for mini-SWE-agent v2.x.
+# Pass this together with the built-in SWE-bench config:
+#   -c swebench.yaml -c configs/qwen3_vllm_mini_swe.yaml
+#
+# mini-SWE-agent's schema can change across releases. Treat this file as a
+# compact, editable starting point and validate it with:
+#   mini-extra swebench --help
+#   mini-extra swebench-single --help
+#   mini --help
+
+agent:
+  step_limit: 80
+  cost_limit: 0
+
+model:
+  model_name: hosted_vllm/qwen3-coder-30b-a3b
+  litellm_model_registry: configs/litellm_registry.json
+  cost_tracking: ignore_errors
+  model_kwargs:
+    api_base: http://127.0.0.1:8001/v1
+    temperature: 0
+    max_tokens: 1024
+    drop_params: true
+
+environment:
+  cwd: /testbed
+  timeout: 180
+  env:
+    PAGER: cat
+    GIT_PAGER: cat
+    PYTHONUNBUFFERED: "1"
+    TQDM_DISABLE: "1"
+
+swebench:
+  subset: lite
+  split: test
+  workers: 1
+  output_dir: outputs/runs
