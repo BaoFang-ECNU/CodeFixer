@@ -6,31 +6,21 @@
   "learned_bug_patterns": [
     "Establish failing test signal before editing.",
     "Make the upper bound inclusive.",
-    "Guard empty input before division.",
-    "Sort scores descending before slicing.",
-    "Strip whitespace before lowercasing.",
-    "Guard empty input before max().",
-    "Use the previous two DP states.",
-    "Increment existing counts instead of resetting.",
-    "Catch ValueError and return the default."
+    "Guard empty input before division."
   ],
-  "num_success": 8,
+  "num_success": 2,
   "num_failure": 0,
   "bug_type_success_rate": {
-    "off_by_one": 1.0,
-    "unknown": 1.0,
-    "division_by_zero": 1.0,
-    "sorting_direction": 1.0,
-    "string_normalization": 1.0,
-    "empty_boundary": 1.0,
-    "dynamic_programming_transition": 1.0,
-    "counting_update": 1.0,
-    "exception_handling": 1.0
+    "unknown": 1.0
+  },
+  "action_pattern_success_rate": {
+    "run_tests": 1.0,
+    "edit_file": 1.0
   },
   "memory": {
     "action_patterns": {
       "edit_file": {
-        "success": 8,
+        "success": 2,
         "failure": 0
       }
     },
