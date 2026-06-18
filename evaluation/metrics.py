@@ -20,6 +20,8 @@ def compute_metrics(results: list[dict[str, Any]], pass_at_k: int = 3, cost_per_
     tool_calls = sum(item.get("tool_calls", 0) for item in results)
     api_cost = tool_calls * cost_per_tool_call
     runtime_cost = sum(item.get("runtime_sec", 0.0) for item in results)
+    java_results = [item for item in results if item.get("language") == "java"]
+    defects4j_results = [item for item in results if item.get("project_source") == "defects4j"]
     return {
         "pass_at_1": round(_pass_at_k(task_groups, 1) if task_groups else successes / n, 4),
         "pass_at_k": round(_pass_at_k(task_groups, pass_at_k) if task_groups else min(1.0, successes / max(1, min(pass_at_k, n))), 4),
@@ -41,6 +43,8 @@ def compute_metrics(results: list[dict[str, Any]], pass_at_k: int = 3, cost_per_
         "num_tasks": float(task_count),
         "num_attempts": float(n),
         "trials_per_task_observed": round(n / max(1, task_count), 4),
+        "java_compile_failure_rate": round(_java_compile_failures(java_results) / len(java_results), 4) if java_results else 0.0,
+        "defects4j_triggering_test_pass_rate": round(sum(1 for item in defects4j_results if item.get("success")) / len(defects4j_results), 4) if defects4j_results else 0.0,
     }
 
 
@@ -66,6 +70,8 @@ def _empty_metrics() -> dict[str, float]:
             "num_tasks": 0.0,
             "num_attempts": 0.0,
             "trials_per_task_observed": 0.0,
+            "java_compile_failure_rate": 0.0,
+            "defects4j_triggering_test_pass_rate": 0.0,
     }
 
 
@@ -85,6 +91,16 @@ def _pass_at_k(task_groups: dict[str, list[dict[str, Any]]], k: int) -> float:
     capped_k = max(1, k)
     passed = sum(1 for attempts in task_groups.values() if any(item.get("success") for item in attempts[:capped_k]))
     return passed / len(task_groups)
+
+
+def _java_compile_failures(results: list[dict[str, Any]]) -> int:
+    failure_markers = ("compilation failed", "compile failed", "javac", "maven compilation failure")
+    count = 0
+    for item in results:
+        text = f"{item.get('failure_reason', '')}\n{item.get('final_test_output', '')}".lower()
+        if any(marker in text for marker in failure_markers):
+            count += 1
+    return count
 
 
 def training_artifact_metrics(output_dir: str | None, total_steps: int = 0) -> dict[str, float]:
