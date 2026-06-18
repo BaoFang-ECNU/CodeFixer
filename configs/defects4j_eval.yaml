@@ -1,0 +1,50 @@
+project:
+  name: CodeFixerDefects4JEval
+  seed: 7
+
+paths:
+  tasks_file: "configs/tasks_defects4j.yaml"
+  logs_dir: "outputs/defects4j_eval/logs"
+  workspaces_dir: "outputs/defects4j_eval/workspaces"
+  results_file: "outputs/defects4j_eval/results.json"
+  summary_file: "outputs/defects4j_eval/summary.md"
+  trajectory_file: "outputs/defects4j_eval/trajectory.jsonl"
+  replay_file: "outputs/defects4j_eval/replay_buffer.jsonl"
+  training_output_dir: "outputs/defects4j_eval/training"
+
+agent:
+  max_steps: 8
+  use_memory: true
+  use_test_feedback: true
+  use_self_evolution: false
+
+orchestrator:
+  mode: multi_agent
+
+policy:
+  type: llm
+
+llm:
+  provider: local
+  api_type: openai_compatible
+  model: qwen3-coder-30b-a3b
+  endpoint: "http://127.0.0.1:8001/v1/chat/completions"
+  max_tokens: 1024
+  temperature: 0.0
+  api_key_env: OPENAI_API_KEY
+
+environment:
+  test_timeout_sec: 600
+  allowed_edit_globs: ["*.java"]
+  unsafe_edit_globs: ["*Test.java", "pom.xml", "build.gradle", "defects4j.build.properties"]
+
+evaluation:
+  system_version: feedback
+  systems: ["baseline", "feedback", "learning"]
+  pass_at_k: 3
+  trials_per_task: 1
+  cost_per_tool_call: 0.0
+  output_dir: "outputs/defects4j_eval"
+  record_reward_breakdown: true
+  run_hidden_tests: true
+
