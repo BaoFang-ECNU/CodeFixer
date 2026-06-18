@@ -29,6 +29,10 @@ class TrajectoryStep:
     done: bool
     patch_diff: str
     timestamp: str
+    agent_role: str = "repairer"
+    graph_node: str = "repair"
+    reward_breakdown: dict[str, Any] | None = None
+    guidance: dict[str, Any] | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -61,4 +65,3 @@ class Trajectory:
         with Path(path).open(mode, encoding="utf-8") as handle:
             for step in self.steps:
                 handle.write(json.dumps(step.to_dict(), ensure_ascii=False) + "\n")
-
