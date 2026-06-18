@@ -47,15 +47,16 @@ def _summary(out: dict) -> str:
     lines = [
         "# System Comparison Summary",
         "",
-        "| system | pass@1 | pass@k | visible pass | hidden/regression pass | avg tools | avg tests | patch lines | unsafe rate | SFT | DPO | OPD | RLVR | guidance | cost |",
-        "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
+        "| system | pass@1 | pass@k | visible pass | hidden/regression pass | avg tools | avg tests | patch lines | unsafe rate | java compile fail | defects4j pass | SFT | DPO | OPD | RLVR | guidance | cost |",
+        "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
     ]
     for system in out["systems"]:
         metrics = out["metrics"][system]
         lines.append(
             f"| {system} | {metrics['pass_at_1']} | {metrics['pass_at_k']} | {metrics['visible_test_pass_rate']} | "
             f"{metrics['hidden_regression_test_pass_rate']} | {metrics['avg_tool_calls']} | {metrics['avg_test_runs']} | "
-            f"{metrics['avg_patch_diff_lines']} | {metrics['unsafe_edit_rate']} | {metrics.get('sft_record_count', 0)} | "
+            f"{metrics['avg_patch_diff_lines']} | {metrics['unsafe_edit_rate']} | {metrics.get('java_compile_failure_rate', 0)} | "
+            f"{metrics.get('defects4j_triggering_test_pass_rate', 0)} | {metrics.get('sft_record_count', 0)} | "
             f"{metrics.get('dpo_pair_count', 0)} | {metrics.get('opd_record_count', 0)} | {metrics.get('rlvr_rollout_count', 0)} | "
             f"{metrics.get('guidance_coverage', 0)} | {metrics['cost_estimate']} |"
         )
