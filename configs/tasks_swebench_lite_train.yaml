@@ -1,0 +1,33 @@
+{
+  "tasks": [
+    {
+      "task_id": "sample__project-1",
+      "language": "python",
+      "project_source": "https://github.com/example/project",
+      "construction": "swebench_lite",
+      "bug_type": "real_repo_bug",
+      "difficulty": "benchmark",
+      "issue": "examples/swebench_lite_tasks/sample__project-1.md",
+      "source_files": [],
+      "allowed_files": [],
+      "test_files": [],
+      "hidden_test_files": [],
+      "test_command": "python -m pytest",
+      "visible_test_command": "python -m pytest",
+      "hidden_test_command": null,
+      "metadata": {
+        "repo": "https://github.com/example/project",
+        "base_commit": "0000000000000000000000000000000000000000",
+        "raw": {
+          "instance_id": "sample__project-1",
+          "repo": "https://github.com/example/project",
+          "base_commit": "0000000000000000000000000000000000000000",
+          "problem_statement": "Sample SWE-bench Lite style issue. Replace this with a real instance.",
+          "file_hints": [],
+          "test_command": "python -m pytest"
+        },
+        "requires_repo_checkout": true
+      }
+    }
+  ]
+}
