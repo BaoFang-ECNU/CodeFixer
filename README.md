@@ -1,5 +1,7 @@
 # CodeFixer：面向代码修复 Agent 的自进化后训练
 
+**重要服务器环境要求：如果要运行 Defects4J 真实 checkout / compile / test，请优先使用 Linux 服务器，并提前安装 Java 11、Git、Subversion、Perl、cpanm 和 Defects4J；Windows 本地主要用于 toy / benchmark smoke test 与配置生成验证。**
+
 CodeFixer 是一个科研型代码修复 Agent 工程。它把“带 bug 的代码任务”建模为一个可交互环境：Agent 读取 issue、检查文件、编辑代码、运行测试、根据反馈计算 reward、记录 trajectory，并导出 SFT / DPO / OPD / RWR / RLVR 等后续训练数据。
 
 当前版本优先保证最小闭环可运行，不在本地下载大模型，也不在本地训练 Qwen。服务器训练阶段可以复用本仓库导出的轨迹和训练数据。
@@ -288,4 +290,3 @@ examples/toy_tasks/task_009/
 5. 对比 SFT、DPO、OPD、RWR、RLVR 对代码修复能力的影响。
 6. 增强多 Agent 协作：DiagnosisAgent、RepairAgent、CriticAgent、EvolutionAgent。
 7. 增加更严格的 unsafe edit 检查和 hidden/regression tests。
-
