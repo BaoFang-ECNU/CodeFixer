@@ -31,3 +31,26 @@ def test_training_artifact_metrics(tmp_path):
     assert metrics["rlvr_rollout_count"] == 1.0
     assert metrics["guidance_coverage"] == 0.5
     assert metrics["memory_pattern_count"] == 1.0
+
+
+def test_java_and_defects4j_metrics():
+    metrics = compute_metrics(
+        [
+            {
+                "task_id": "defects4j_Lang_1",
+                "success": False,
+                "language": "java",
+                "project_source": "defects4j",
+                "final_test_output": "Compilation failed: javac error",
+            },
+            {
+                "task_id": "defects4j_Lang_2",
+                "success": True,
+                "language": "java",
+                "project_source": "defects4j",
+                "final_test_output": "all tests pass",
+            },
+        ]
+    )
+    assert metrics["java_compile_failure_rate"] == 0.5
+    assert metrics["defects4j_triggering_test_pass_rate"] == 0.5
