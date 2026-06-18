@@ -5,12 +5,13 @@
   },
   "paths": {
     "tasks_file": "configs/tasks_toy.yaml",
-    "logs_dir": "logs",
-    "workspaces_dir": "logs/workspaces",
-    "results_file": "evaluation/results.json",
-    "summary_file": "evaluation/summary.md",
-    "trajectory_file": "logs/sample_trajectory.jsonl",
-    "replay_file": "logs/replay_buffer.jsonl"
+    "logs_dir": "outputs/evaluation/logs",
+    "workspaces_dir": "outputs/evaluation/workspaces",
+    "results_file": "outputs/evaluation/results.json",
+    "summary_file": "outputs/evaluation/summary.md",
+    "trajectory_file": "outputs/evaluation/trajectory.jsonl",
+    "replay_file": "outputs/evaluation/replay_buffer.jsonl",
+    "training_output_dir": "outputs/evaluation/training"
   },
   "agent": {
     "max_steps": 6,
@@ -39,8 +40,24 @@
   },
   "evaluation": {
     "system_version": "feedback",
+    "systems": ["baseline", "feedback", "learning"],
+    "output_dir": "outputs/evaluation",
     "pass_at_k": 3,
-    "trials_per_task": 1,
-    "cost_per_tool_call": 0.001
+    "trials_per_task": 3,
+    "cost_per_tool_call": 0.001,
+    "record_reward_breakdown": true,
+    "run_hidden_tests": true
+  },
+  "training": {
+    "guidance": {
+      "enabled": true
+    }
+  },
+  "evolution": {
+    "export_sft": true,
+    "export_dpo_opd": true,
+    "export_rwr": true,
+    "export_rlvr": true,
+    "export_guidance": true
   }
 }
