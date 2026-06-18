@@ -76,7 +76,7 @@ class CodeRepairEnv:
     def search_code(self, keyword: str) -> list[dict[str, str | int]]:
         self.tool_calls += 1
         results: list[dict[str, str | int]] = []
-        for pattern in ("*.py", "*.js"):
+        for pattern in ("*.py", "*.js", "*.java"):
             for path in self.workspace.glob(pattern):
                 for line_no, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
                     if keyword.lower() in line.lower():
