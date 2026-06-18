@@ -16,6 +16,7 @@ models:
     role: target_trainable_repair_model
     provider: local_openai_compatible
     policy_type: llm
+    api_type: openai_compatible
     endpoint: "http://127.0.0.1:8000/v1/chat/completions"
     model_name: "Qwen/Qwen2.5-Coder-7B-Instruct"
     max_tokens: 1024
@@ -29,6 +30,7 @@ models:
     role: strong_server_baseline
     provider: local_openai_compatible
     policy_type: llm
+    api_type: openai_compatible
     endpoint: "http://127.0.0.1:8001/v1/chat/completions"
     model_name: "qwen3-coder-30b-a3b"
     max_tokens: 1024
