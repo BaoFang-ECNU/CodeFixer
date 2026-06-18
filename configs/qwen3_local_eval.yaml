@@ -1,0 +1,65 @@
+project:
+  name: CodeFixerQwen3LocalEval
+  seed: 7
+
+resource_selection:
+  dataset: codefixer_benchmark
+  model: qwen3_coder_30b_a3b_vllm
+  max_tasks: 3
+
+paths:
+  tasks_file: "configs/tasks_benchmark.yaml"
+  logs_dir: "outputs/qwen3_local_eval/logs"
+  workspaces_dir: "outputs/qwen3_local_eval/workspaces"
+  results_file: "outputs/qwen3_local_eval/results.json"
+  summary_file: "outputs/qwen3_local_eval/summary.md"
+  trajectory_file: "outputs/qwen3_local_eval/trajectory.jsonl"
+  replay_file: "outputs/qwen3_local_eval/replay_buffer.jsonl"
+  training_output_dir: "outputs/qwen3_local_eval/training"
+
+agent:
+  max_steps: 6
+  use_memory: true
+  use_test_feedback: true
+  use_self_evolution: true
+
+orchestrator:
+  mode: multi_agent
+
+policy:
+  type: llm
+
+llm:
+  provider: local
+  api_type: openai_compatible
+  model: qwen3-coder-30b-a3b
+  endpoint: "http://127.0.0.1:8001/v1/chat/completions"
+  max_tokens: 1024
+  temperature: 0.0
+  api_key_env: OPENAI_API_KEY
+
+environment:
+  test_timeout_sec: 60
+  allowed_edit_globs: ["*.py", "*.js"]
+  unsafe_edit_globs: ["test_*.py", "test_*.js", "*Test.java"]
+
+evaluation:
+  system_version: feedback
+  pass_at_k: 3
+  trials_per_task: 1
+  cost_per_tool_call: 0.0
+  output_dir: "outputs/qwen3_local_eval"
+  record_reward_breakdown: true
+  run_hidden_tests: true
+
+training:
+  guidance:
+    enabled: true
+
+evolution:
+  export_sft: true
+  export_dpo_opd: true
+  export_rwr: true
+  export_rlvr: true
+  export_guidance: true
+
