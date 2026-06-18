@@ -72,6 +72,42 @@ TASK_TEMPLATES = [
         "hidden": "from buggy_code import count_words\n\ndef test_hidden():\n    assert count_words(['a', 'b', 'a']) == {'a': 2, 'b': 1}\n",
     },
     {
+        "task_id": "bench_py_007",
+        "language": "python",
+        "bug_type": "empty_boundary",
+        "issue": "largest_or_none should return None for an empty list.",
+        "source": "def largest_or_none(values):\n    return max(values)\n",
+        "visible": "from buggy_code import largest_or_none\n\ndef test_visible():\n    assert largest_or_none([]) is None\n",
+        "hidden": "from buggy_code import largest_or_none\n\ndef test_hidden():\n    assert largest_or_none([2, 9, 1]) == 9\n",
+    },
+    {
+        "task_id": "bench_py_008",
+        "language": "python",
+        "bug_type": "exception_handling",
+        "issue": "parse_int_or_default should return the default value for invalid input.",
+        "source": "def parse_int_or_default(text, default=0):\n    return int(text)\n",
+        "visible": "from buggy_code import parse_int_or_default\n\ndef test_visible():\n    assert parse_int_or_default('bad', default=-1) == -1\n",
+        "hidden": "from buggy_code import parse_int_or_default\n\ndef test_hidden():\n    assert parse_int_or_default('42', default=-1) == 42\n",
+    },
+    {
+        "task_id": "bench_py_009",
+        "language": "python",
+        "bug_type": "boundary_condition",
+        "issue": "is_adult should treat age 18 as adult, so the boundary is inclusive.",
+        "source": "def is_adult(age):\n    return age > 18\n",
+        "visible": "from buggy_code import is_adult\n\ndef test_visible():\n    assert is_adult(18) is True\n",
+        "hidden": "from buggy_code import is_adult\n\ndef test_hidden():\n    assert is_adult(17) is False\n    assert is_adult(21) is True\n",
+    },
+    {
+        "task_id": "bench_py_010",
+        "language": "python",
+        "bug_type": "indexing_error",
+        "issue": "last_item should return the final element of a non-empty list.",
+        "source": "def last_item(values):\n    return values[0]\n",
+        "visible": "from buggy_code import last_item\n\ndef test_visible():\n    assert last_item([1, 2, 3]) == 3\n",
+        "hidden": "from buggy_code import last_item\n\ndef test_hidden():\n    assert last_item(['a', 'b']) == 'b'\n",
+    },
+    {
         "task_id": "bench_js_001",
         "language": "javascript",
         "bug_type": "string_normalization",
@@ -107,7 +143,70 @@ TASK_TEMPLATES = [
         "visible": JS_ASSERT_HEADER + "assert.strictEqual(lib.parseIntOrDefault('bad', -1), -1);\n",
         "hidden": JS_ASSERT_HEADER + "assert.strictEqual(lib.parseIntOrDefault('42', -1), 42);\n",
     },
+    {
+        "task_id": "bench_js_005",
+        "language": "javascript",
+        "bug_type": "off_by_one",
+        "issue": "sumToN should include the upper bound when summing 1..n.",
+        "source": "function sumToN(n) {\n  let total = 0;\n  for (let i = 1; i < n; i += 1) {\n    total += i;\n  }\n  return total;\n}\nmodule.exports = { sumToN };\n",
+        "visible": JS_ASSERT_HEADER + "assert.strictEqual(lib.sumToN(3), 6);\n",
+        "hidden": JS_ASSERT_HEADER + "assert.strictEqual(lib.sumToN(1), 1);\nassert.strictEqual(lib.sumToN(5), 15);\n",
+    },
+    {
+        "task_id": "bench_js_006",
+        "language": "javascript",
+        "bug_type": "sorting_direction",
+        "issue": "topScores should return the highest scores in descending order.",
+        "source": "function topScores(scores, k) {\n  return scores.slice().sort((a, b) => a - b).slice(0, k);\n}\nmodule.exports = { topScores };\n",
+        "visible": JS_ASSERT_HEADER + "assert.deepStrictEqual(lib.topScores([1, 3, 2], 2), [3, 2]);\n",
+        "hidden": JS_ASSERT_HEADER + "assert.deepStrictEqual(lib.topScores([10, 40, 20, 30], 3), [40, 30, 20]);\n",
+    },
+    {
+        "task_id": "bench_js_007",
+        "language": "javascript",
+        "bug_type": "division_by_zero",
+        "issue": "safeAverage should return 0 for an empty array.",
+        "source": "function safeAverage(values) {\n  return values.reduce((total, value) => total + value, 0) / values.length;\n}\nmodule.exports = { safeAverage };\n",
+        "visible": JS_ASSERT_HEADER + "assert.strictEqual(lib.safeAverage([]), 0);\n",
+        "hidden": JS_ASSERT_HEADER + "assert.strictEqual(lib.safeAverage([2, 4, 6]), 4);\n",
+    },
+    {
+        "task_id": "bench_js_008",
+        "language": "javascript",
+        "bug_type": "boundary_condition",
+        "issue": "isAdult should treat age 18 as adult, so the boundary is inclusive.",
+        "source": "function isAdult(age) {\n  return age > 18;\n}\nmodule.exports = { isAdult };\n",
+        "visible": JS_ASSERT_HEADER + "assert.strictEqual(lib.isAdult(18), true);\n",
+        "hidden": JS_ASSERT_HEADER + "assert.strictEqual(lib.isAdult(17), false);\nassert.strictEqual(lib.isAdult(21), true);\n",
+    },
+    {
+        "task_id": "bench_js_009",
+        "language": "javascript",
+        "bug_type": "indexing_error",
+        "issue": "lastItem should return the final element of a non-empty array.",
+        "source": "function lastItem(values) {\n  return values[0];\n}\nmodule.exports = { lastItem };\n",
+        "visible": JS_ASSERT_HEADER + "assert.strictEqual(lib.lastItem([1, 2, 3]), 3);\n",
+        "hidden": JS_ASSERT_HEADER + "assert.strictEqual(lib.lastItem(['a', 'b']), 'b');\n",
+    },
+    {
+        "task_id": "bench_js_010",
+        "language": "javascript",
+        "bug_type": "string_normalization",
+        "issue": "containsKeyword should compare text and keyword case-insensitively.",
+        "source": "function containsKeyword(text, keyword) {\n  return text.includes(keyword);\n}\nmodule.exports = { containsKeyword };\n",
+        "visible": JS_ASSERT_HEADER + "assert.strictEqual(lib.containsKeyword('Hello World', 'hello'), true);\n",
+        "hidden": JS_ASSERT_HEADER + "assert.strictEqual(lib.containsKeyword('Agentic Repair', 'repair'), true);\nassert.strictEqual(lib.containsKeyword('Agentic Repair', 'missing'), false);\n",
+    },
 ]
+
+
+def _config_path(path: Path, root: Path) -> str:
+    """Return a stable path for generated task configs."""
+
+    try:
+        return str(path.relative_to(root)).replace("\\", "/")
+    except ValueError:
+        return str(path).replace("\\", "/")
 
 
 def main() -> None:
@@ -141,11 +240,11 @@ def main() -> None:
                 "construction": "manual_injection",
                 "bug_type": template["bug_type"],
                 "difficulty": "easy",
-                "issue": str((task_dir / "issue.md").relative_to(root)).replace("\\", "/"),
-                "source_files": [str((task_dir / source_name).relative_to(root)).replace("\\", "/")],
-                "allowed_files": [str((task_dir / source_name).relative_to(root)).replace("\\", "/")],
-                "test_files": [str((task_dir / visible_name).relative_to(root)).replace("\\", "/")],
-                "hidden_test_files": [str((task_dir / hidden_name).relative_to(root)).replace("\\", "/")],
+                "issue": _config_path(task_dir / "issue.md", root),
+                "source_files": [_config_path(task_dir / source_name, root)],
+                "allowed_files": [_config_path(task_dir / source_name, root)],
+                "test_files": [_config_path(task_dir / visible_name, root)],
+                "hidden_test_files": [_config_path(task_dir / hidden_name, root)],
                 "test_command": visible_command,
                 "visible_test_command": visible_command,
                 "hidden_test_command": hidden_command,
@@ -158,4 +257,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
