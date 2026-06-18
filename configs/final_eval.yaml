@@ -1,0 +1,61 @@
+project:
+  name: CodeFixerFinalExperiments
+  seed: 7
+
+paths:
+  tasks_file: "configs/tasks_benchmark.yaml"
+  logs_dir: "outputs/final_experiments/logs"
+  workspaces_dir: "outputs/final_experiments/workspaces"
+  results_file: "outputs/final_experiments/results.json"
+  summary_file: "outputs/final_experiments/summary.md"
+  trajectory_file: "outputs/final_experiments/trajectory.jsonl"
+  replay_file: "outputs/final_experiments/replay_buffer.jsonl"
+  training_output_dir: "outputs/final_experiments/training"
+
+agent:
+  max_steps: 8
+  use_memory: true
+  use_test_feedback: true
+  use_self_evolution: true
+
+orchestrator:
+  mode: multi_agent
+
+policy:
+  type: llm
+
+llm:
+  provider: local
+  api_type: openai_compatible
+  model: qwen3-coder-30b-a3b
+  endpoint: "http://127.0.0.1:8001/v1/chat/completions"
+  max_tokens: 1024
+  temperature: 0.0
+  api_key_env: OPENAI_API_KEY
+
+environment:
+  test_timeout_sec: 120
+  allowed_edit_globs: ["*.py", "*.js", "*.java"]
+  unsafe_edit_globs: ["test_*.py", "test_*.js", "*Test.java", "pom.xml", "build.gradle"]
+
+evaluation:
+  system_version: learning
+  systems: ["baseline", "feedback", "learning"]
+  pass_at_k: 3
+  trials_per_task: 3
+  cost_per_tool_call: 0.0
+  output_dir: "outputs/final_experiments"
+  record_reward_breakdown: true
+  run_hidden_tests: true
+
+training:
+  guidance:
+    enabled: true
+
+evolution:
+  export_sft: true
+  export_dpo_opd: true
+  export_rwr: true
+  export_rlvr: true
+  export_guidance: true
+
