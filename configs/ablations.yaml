@@ -21,6 +21,41 @@
         "use_failure_memory": false
       }
     },
+    "no_guidance": {
+      "training": {
+        "guidance": {
+          "enabled": false
+        }
+      },
+      "evolution": {
+        "export_guidance": false
+      }
+    },
+    "no_reward_breakdown": {
+      "evaluation": {
+        "record_reward_breakdown": false
+      }
+    },
+    "no_self_evolution_export": {
+      "agent": {
+        "use_self_evolution": false
+      }
+    },
+    "no_dpo_opd_export": {
+      "evolution": {
+        "export_dpo_opd": false
+      }
+    },
+    "no_rlvr_export": {
+      "evolution": {
+        "export_rlvr": false
+      }
+    },
+    "no_hidden_reward": {
+      "evaluation": {
+        "run_hidden_tests": false
+      }
+    },
     "test_budget_1": {
       "agent": {
         "max_steps": 1
@@ -48,4 +83,3 @@
     }
   }
 }
-
