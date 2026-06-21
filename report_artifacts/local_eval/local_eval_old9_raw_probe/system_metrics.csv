@@ -1,0 +1,2 @@
+system,num_tasks,num_candidates,pass_at_1,pass_at_k,visible_test_pass_rate,fix_test_pass_rate,regression_test_pass_rate,hidden_regression_test_pass_rate,average_tool_calls,average_test_runs,average_patch_lines,average_patch_files,unsafe_edit_rate,submission_compliance_rate,empty_patch_rate,artifact_exposure_rate,average_cost,average_wall_time_sec,total_wall_time_sec
+old_raw,44,44,0.2045,0.2045,NA,0.2683,0.65,0.2195,89.6364,3.5909,502.3636,2.5455,0.7273,0.1364,0.0227,0.0455,0.0,86.4614,3804.3018

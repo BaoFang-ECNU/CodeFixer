@@ -101,12 +101,40 @@ Rules:
 - Do not look for or modify hidden tests.
 - Do not edit files under tests/ or any test configuration files.
 - Do not create backup files such as *.backup, *.bak, or *.orig.
+- Stay in the provided repository. Do not clone, copy, or work from another checkout.
+- Do not `cd` into `/tmp`, `/home/user`, or any path outside the repository.
+- The only allowed `/tmp` path is `/tmp/final.patch` for the final diff file.
 - If you create temporary reproduction scripts, remove them before finishing.
 - Do not hard-code benchmark answers.
 - Only modify source files needed for the fix.
 - Run available checks when useful.
-- When finished, submit the final answer with a concise patch summary.
+- Before finishing, remove temporary files and inspect the final diff.
+
+Mandatory patch submission protocol:
+- Your final submitted output must be only a valid unified git diff, not a summary.
+- The final patch must be generated from the working tree with `git diff --binary`.
+- Verify the final patch with `git apply --check` before finishing.
+- Do not include Markdown fences, bullet lists, explanations, or natural language in the final patch output.
+- The first non-empty patch line must look like `diff --git a/path b/path`.
+- If there is no valid source-code fix, leave an empty patch rather than submitting a natural-language explanation.
+- Finish by issuing `echo COMPLETE_TASK_AND_SUBMIT_FINAL_OUTPUT && cat /tmp/final.patch` after creating and verifying `/tmp/final.patch`.
 """
+
+
+def append_feedback(prompt: str, feedback_path: Path | None) -> str:
+    if not feedback_path:
+        return prompt
+    if not feedback_path.exists():
+        raise SystemExit(f"Feedback file not found: {feedback_path}")
+    feedback = feedback_path.read_text(encoding="utf-8", errors="ignore").strip()
+    if not feedback:
+        return prompt
+    return (
+        prompt
+        + "\n\nFeedback from previous candidate attempts:\n"
+        + feedback
+        + "\n\nUse this feedback to produce a cleaner source-only patch. Do not mention the feedback in the final patch.\n"
+    )
 
 
 def main() -> int:
@@ -119,6 +147,7 @@ def main() -> int:
     parser.add_argument("--timeout-sec", type=int, default=1800)
     parser.add_argument("--step-limit", type=int, default=80)
     parser.add_argument("--max-tokens", type=int, default=1024)
+    parser.add_argument("--feedback-file", default="", help="Optional feedback summary to append to the task prompt.")
     args = parser.parse_args()
 
     manifest = Path(args.manifest)
@@ -133,12 +162,15 @@ def main() -> int:
     traj_path = out_dir / "trajectory.json"
     metadata_path = out_dir / "metadata.json"
     prompt_path = out_dir / "prompt.txt"
-    prompt = build_prompt(task)
+    feedback_path = Path(args.feedback_file) if args.feedback_file else None
+    prompt = append_feedback(build_prompt(task), feedback_path)
     prompt_path.write_text(prompt, encoding="utf-8")
 
     clean_repo(repo)
 
     env = os.environ.copy()
+    env.setdefault("MSWEA_MODEL_NAME", args.model)
+    env.setdefault("MSWEA_MODEL_API_KEY_NAME", "OPENAI_API_KEY")
     env.setdefault("OPENAI_API_KEY", "dummy")
     env.setdefault("LITELLM_MODEL_REGISTRY_PATH", str(PROJECT_ROOT / "configs" / "litellm_registry.json"))
     env.setdefault("MSWEA_COST_TRACKING", "ignore_errors")
@@ -177,16 +209,20 @@ def main() -> int:
     with log_path.open("w", encoding="utf-8", errors="ignore") as log:
         log.write("[local-task] command:\n")
         log.write(" ".join(cmd) + "\n\n")
+        log.write("[local-task] stdin: one newline is preloaded so mini can exit its final prompt in batch mode.\n\n")
         log.flush()
         process = subprocess.Popen(
             cmd,
             cwd=str(PROJECT_ROOT),
             text=True,
-            stdin=subprocess.DEVNULL,
+            stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             env=env,
         )
+        if process.stdin is not None:
+            process.stdin.write("\n")
+            process.stdin.close()
         deadline = start + args.timeout_sec
         assert process.stdout is not None
         while True:
@@ -222,6 +258,7 @@ def main() -> int:
         "cost": 0.0,
         "step_limit": args.step_limit,
         "max_tokens": args.max_tokens,
+        "feedback_file": str(feedback_path) if feedback_path else "",
         "notes": "vanilla mini-SWE-agent local baseline",
     }
     metadata_path.write_text(json.dumps(metadata, ensure_ascii=False, indent=2), encoding="utf-8")

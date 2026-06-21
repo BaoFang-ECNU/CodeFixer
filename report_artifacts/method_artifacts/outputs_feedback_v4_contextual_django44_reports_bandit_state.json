@@ -1,0 +1,308 @@
+{
+  "arms": {
+    "failing_test_first": {
+      "alpha": 1.0,
+      "beta": 1.0,
+      "pulls": 0,
+      "reward_sum": 0.0
+    },
+    "localization_first": {
+      "alpha": 1.0,
+      "beta": 1.0,
+      "pulls": 0,
+      "reward_sum": 0.0
+    },
+    "minimal_patch": {
+      "alpha": 1.0,
+      "beta": 1.0,
+      "pulls": 0,
+      "reward_sum": 0.0
+    },
+    "regression_conservative": {
+      "alpha": 1.0,
+      "beta": 1.0,
+      "pulls": 0,
+      "reward_sum": 0.0
+    },
+    "traceback_api_contract": {
+      "alpha": 1.0,
+      "beta": 1.0,
+      "pulls": 0,
+      "reward_sum": 0.0
+    },
+    "v3_control": {
+      "alpha": 1.0,
+      "beta": 1.0,
+      "pulls": 0,
+      "reward_sum": 0.0
+    }
+  },
+  "contexts": {
+    "assertion_error": {
+      "failing_test_first": {
+        "alpha": 1.0,
+        "beta": 1.0,
+        "pulls": 0,
+        "reward_sum": 0.0
+      },
+      "localization_first": {
+        "alpha": 1.0,
+        "beta": 1.0,
+        "pulls": 0,
+        "reward_sum": 0.0
+      },
+      "minimal_patch": {
+        "alpha": 1.0,
+        "beta": 1.0,
+        "pulls": 0,
+        "reward_sum": 0.0
+      },
+      "regression_conservative": {
+        "alpha": 1.0,
+        "beta": 1.0,
+        "pulls": 0,
+        "reward_sum": 0.0
+      },
+      "traceback_api_contract": {
+        "alpha": 1.0,
+        "beta": 1.0,
+        "pulls": 0,
+        "reward_sum": 0.0
+      },
+      "v3_control": {
+        "alpha": 1.0,
+        "beta": 1.0,
+        "pulls": 0,
+        "reward_sum": 0.0
+      }
+    },
+    "generic_failure": {
+      "failing_test_first": {
+        "alpha": 1.0,
+        "beta": 1.0,
+        "pulls": 0,
+        "reward_sum": 0.0
+      },
+      "localization_first": {
+        "alpha": 1.75,
+        "beta": 1.25,
+        "pulls": 1,
+        "reward_sum": 0.75
+      },
+      "minimal_patch": {
+        "alpha": 2.5,
+        "beta": 1.5,
+        "pulls": 2,
+        "reward_sum": 1.5
+      },
+      "regression_conservative": {
+        "alpha": 1.0,
+        "beta": 1.0,
+        "pulls": 0,
+        "reward_sum": 0.0
+      },
+      "traceback_api_contract": {
+        "alpha": 1.0,
+        "beta": 1.0,
+        "pulls": 0,
+        "reward_sum": 0.0
+      },
+      "v3_control": {
+        "alpha": 2.5,
+        "beta": 1.5,
+        "pulls": 2,
+        "reward_sum": 1.5
+      }
+    },
+    "import_error": {
+      "failing_test_first": {
+        "alpha": 1.0,
+        "beta": 1.0,
+        "pulls": 0,
+        "reward_sum": 0.0
+      },
+      "localization_first": {
+        "alpha": 1.0,
+        "beta": 1.0,
+        "pulls": 0,
+        "reward_sum": 0.0
+      },
+      "minimal_patch": {
+        "alpha": 1.0,
+        "beta": 1.0,
+        "pulls": 0,
+        "reward_sum": 0.0
+      },
+      "regression_conservative": {
+        "alpha": 1.0,
+        "beta": 1.0,
+        "pulls": 0,
+        "reward_sum": 0.0
+      },
+      "traceback_api_contract": {
+        "alpha": 1.0,
+        "beta": 1.0,
+        "pulls": 0,
+        "reward_sum": 0.0
+      },
+      "v3_control": {
+        "alpha": 1.0,
+        "beta": 1.0,
+        "pulls": 0,
+        "reward_sum": 0.0
+      }
+    },
+    "patch_not_apply": {
+      "failing_test_first": {
+        "alpha": 1.0,
+        "beta": 1.0,
+        "pulls": 0,
+        "reward_sum": 0.0
+      },
+      "localization_first": {
+        "alpha": 1.0,
+        "beta": 1.0,
+        "pulls": 0,
+        "reward_sum": 0.0
+      },
+      "minimal_patch": {
+        "alpha": 1.0,
+        "beta": 1.0,
+        "pulls": 0,
+        "reward_sum": 0.0
+      },
+      "regression_conservative": {
+        "alpha": 1.0,
+        "beta": 1.0,
+        "pulls": 0,
+        "reward_sum": 0.0
+      },
+      "traceback_api_contract": {
+        "alpha": 1.0,
+        "beta": 1.0,
+        "pulls": 0,
+        "reward_sum": 0.0
+      },
+      "v3_control": {
+        "alpha": 1.0,
+        "beta": 1.0,
+        "pulls": 0,
+        "reward_sum": 0.0
+      }
+    },
+    "syntax_error": {
+      "failing_test_first": {
+        "alpha": 1.0,
+        "beta": 1.0,
+        "pulls": 0,
+        "reward_sum": 0.0
+      },
+      "localization_first": {
+        "alpha": 1.0,
+        "beta": 1.0,
+        "pulls": 0,
+        "reward_sum": 0.0
+      },
+      "minimal_patch": {
+        "alpha": 1.0,
+        "beta": 1.0,
+        "pulls": 0,
+        "reward_sum": 0.0
+      },
+      "regression_conservative": {
+        "alpha": 1.0,
+        "beta": 1.0,
+        "pulls": 0,
+        "reward_sum": 0.0
+      },
+      "traceback_api_contract": {
+        "alpha": 1.0,
+        "beta": 1.0,
+        "pulls": 0,
+        "reward_sum": 0.0
+      },
+      "v3_control": {
+        "alpha": 1.0,
+        "beta": 1.0,
+        "pulls": 0,
+        "reward_sum": 0.0
+      }
+    },
+    "timeout": {
+      "failing_test_first": {
+        "alpha": 1.0,
+        "beta": 1.0,
+        "pulls": 0,
+        "reward_sum": 0.0
+      },
+      "localization_first": {
+        "alpha": 1.0,
+        "beta": 1.0,
+        "pulls": 0,
+        "reward_sum": 0.0
+      },
+      "minimal_patch": {
+        "alpha": 1.0,
+        "beta": 1.0,
+        "pulls": 0,
+        "reward_sum": 0.0
+      },
+      "regression_conservative": {
+        "alpha": 1.0,
+        "beta": 1.0,
+        "pulls": 0,
+        "reward_sum": 0.0
+      },
+      "traceback_api_contract": {
+        "alpha": 1.0,
+        "beta": 1.0,
+        "pulls": 0,
+        "reward_sum": 0.0
+      },
+      "v3_control": {
+        "alpha": 1.0,
+        "beta": 1.0,
+        "pulls": 0,
+        "reward_sum": 0.0
+      }
+    },
+    "unsafe_or_noncompliant": {
+      "failing_test_first": {
+        "alpha": 1.0,
+        "beta": 1.0,
+        "pulls": 0,
+        "reward_sum": 0.0
+      },
+      "localization_first": {
+        "alpha": 1.0,
+        "beta": 1.0,
+        "pulls": 0,
+        "reward_sum": 0.0
+      },
+      "minimal_patch": {
+        "alpha": 1.0,
+        "beta": 1.0,
+        "pulls": 0,
+        "reward_sum": 0.0
+      },
+      "regression_conservative": {
+        "alpha": 1.0,
+        "beta": 1.0,
+        "pulls": 0,
+        "reward_sum": 0.0
+      },
+      "traceback_api_contract": {
+        "alpha": 1.0,
+        "beta": 1.0,
+        "pulls": 0,
+        "reward_sum": 0.0
+      },
+      "v3_control": {
+        "alpha": 1.0,
+        "beta": 1.0,
+        "pulls": 0,
+        "reward_sum": 0.0
+      }
+    }
+  }
+}

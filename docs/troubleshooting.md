@@ -59,6 +59,44 @@ Check all three names:
 
 The mini-SWE-agent model should be `hosted_vllm/qwen3-coder-30b-a3b`.
 
+## mini-SWE-agent Enters Quickstart During Batch Runs
+
+If logs contain:
+
+```text
+To get started, we need to set up your global config file.
+Enter your default model
+Enter your API key name
+Aborted.
+```
+
+then mini-SWE-agent's global config is incomplete. Batch runs are
+non-interactive, so the quickstart prompt aborts the task.
+
+Run:
+
+```bash
+bash scripts/setup_mini_config.sh
+```
+
+The config file should contain:
+
+```text
+OPENAI_API_KEY='dummy'
+MSWEA_MODEL_NAME='hosted_vllm/qwen3-coder-30b-a3b'
+MSWEA_MODEL_API_KEY_NAME='OPENAI_API_KEY'
+```
+
+Check:
+
+```bash
+mini --help | head -20
+```
+
+It may print `Loading global config`, but it must not ask for the default model
+or API key name. `scripts/run_local_task.py` also injects these values into the
+mini subprocess environment as a backup.
+
 ## vLLM Rejects tool_choice auto
 
 mini-SWE-agent uses tool calls. If vLLM returns:

@@ -194,6 +194,7 @@ def evaluate_candidate(system: SystemSpec, task: TaskSpec, candidate_dir: Path, 
             notes.append(f"copy_failed:{exc}")
         else:
             clean_result = clean_worktree(worktree, task.base_commit)
+            write_command_log(eval_log_dir, "source_clean", clean_result)
             if clean_result.returncode != 0:
                 notes.append("source_clean_failed")
                 notes.append(_trim(clean_result.stderr or clean_result.stdout))
@@ -298,21 +299,33 @@ def evaluate_candidate(system: SystemSpec, task: TaskSpec, candidate_dir: Path, 
 
 def apply_patch(worktree: Path, patch_path: Path) -> subprocess.CompletedProcess[str]:
     if not patch_path.exists():
-        return subprocess.CompletedProcess(["git", "apply"], 2, "", "missing patch.diff")
-    return subprocess.run(
-        ["git", "apply", "--whitespace=nowarn", str(patch_path)],
-        cwd=str(worktree),
-        text=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        timeout=60,
+        return _annotate_result(
+            subprocess.CompletedProcess(["git", "apply"], 2, "", "missing patch.diff"),
+            cwd=worktree,
+            timeout_sec=60,
+            duration_sec=0.0,
+            shell=False,
+        )
+    args = ["git", "apply", "--whitespace=nowarn", str(patch_path)]
+    return _run_subprocess(
+        args,
+        cwd=worktree,
+        timeout_sec=60,
+        shell=False,
     )
 
 
 def clean_worktree(worktree: Path, base_commit: str = "") -> subprocess.CompletedProcess[str]:
     if not (worktree / ".git").exists():
-        return subprocess.CompletedProcess(["git", "reset"], 0, "", "")
+        return _annotate_result(
+            subprocess.CompletedProcess(["git", "reset"], 0, "", ""),
+            cwd=worktree,
+            timeout_sec=60,
+            duration_sec=0.0,
+            shell=False,
+        )
     target = base_commit.strip() or "HEAD"
+    start = time.monotonic()
     reset = subprocess.run(
         ["git", "reset", "--hard", target],
         cwd=str(worktree),
@@ -322,7 +335,13 @@ def clean_worktree(worktree: Path, base_commit: str = "") -> subprocess.Complete
         timeout=60,
     )
     if reset.returncode != 0:
-        return reset
+        return _annotate_result(
+            reset,
+            cwd=worktree,
+            timeout_sec=60,
+            duration_sec=time.monotonic() - start,
+            shell=False,
+        )
     clean = subprocess.run(
         ["git", "clean", "-fd"],
         cwd=str(worktree),
@@ -331,17 +350,24 @@ def clean_worktree(worktree: Path, base_commit: str = "") -> subprocess.Complete
         stderr=subprocess.PIPE,
         timeout=60,
     )
-    return subprocess.CompletedProcess(
+    return _annotate_result(
+        subprocess.CompletedProcess(
         ["git", "reset", "--hard", target, "&&", "git", "clean", "-fd"],
         clean.returncode,
         (reset.stdout or "") + (clean.stdout or ""),
         (reset.stderr or "") + (clean.stderr or ""),
+        ),
+        cwd=worktree,
+        timeout_sec=60,
+        duration_sec=time.monotonic() - start,
+        shell=False,
     )
 
 
 def run_shell(command: str, cwd: Path, timeout_sec: int) -> subprocess.CompletedProcess[str]:
+    start = time.monotonic()
     try:
-        return subprocess.run(
+        result = subprocess.run(
             command,
             cwd=str(cwd),
             shell=True,
@@ -350,12 +376,25 @@ def run_shell(command: str, cwd: Path, timeout_sec: int) -> subprocess.Completed
             stderr=subprocess.PIPE,
             timeout=timeout_sec,
         )
+        return _annotate_result(
+            result,
+            cwd=cwd,
+            timeout_sec=timeout_sec,
+            duration_sec=time.monotonic() - start,
+            shell=True,
+        )
     except subprocess.TimeoutExpired as exc:
-        return subprocess.CompletedProcess(
-            command,
-            124,
-            exc.stdout or "",
-            exc.stderr or f"timed out after {timeout_sec} seconds",
+        return _annotate_result(
+            subprocess.CompletedProcess(
+                command,
+                124,
+                exc.stdout or "",
+                exc.stderr or f"timed out after {timeout_sec} seconds",
+            ),
+            cwd=cwd,
+            timeout_sec=timeout_sec,
+            duration_sec=time.monotonic() - start,
+            shell=True,
         )
 
 
@@ -367,7 +406,14 @@ def write_command_log(log_dir: Path, name: str, result: subprocess.CompletedProc
         json.dumps(
             {
                 "args": result.args,
+                "command": _command_to_string(result.args),
                 "returncode": result.returncode,
+                "cwd": getattr(result, "cwd", NA),
+                "timeout_sec": getattr(result, "timeout_sec", NA),
+                "duration_sec": getattr(result, "duration_sec", NA),
+                "shell": getattr(result, "shell", NA),
+                "stdout_path": f"{safe_name}.stdout.txt",
+                "stderr_path": f"{safe_name}.stderr.txt",
             },
             ensure_ascii=False,
             indent=2,
@@ -375,6 +421,53 @@ def write_command_log(log_dir: Path, name: str, result: subprocess.CompletedProc
         ),
         encoding="utf-8",
     )
+
+
+def _run_subprocess(
+    args: list[str] | str,
+    cwd: Path,
+    timeout_sec: int,
+    shell: bool,
+) -> subprocess.CompletedProcess[str]:
+    start = time.monotonic()
+    result = subprocess.run(
+        args,
+        cwd=str(cwd),
+        shell=shell,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        timeout=timeout_sec,
+    )
+    return _annotate_result(
+        result,
+        cwd=cwd,
+        timeout_sec=timeout_sec,
+        duration_sec=time.monotonic() - start,
+        shell=shell,
+    )
+
+
+def _annotate_result(
+    result: subprocess.CompletedProcess[str],
+    cwd: Path,
+    timeout_sec: int,
+    duration_sec: float,
+    shell: bool,
+) -> subprocess.CompletedProcess[str]:
+    result.cwd = str(cwd)
+    result.timeout_sec = timeout_sec
+    result.duration_sec = round(duration_sec, 4)
+    result.shell = shell
+    return result
+
+
+def _command_to_string(args: Any) -> str:
+    if isinstance(args, str):
+        return args
+    if isinstance(args, (list, tuple)):
+        return " ".join(str(item) for item in args)
+    return str(args)
 
 
 def analyze_patch(patch_text: str, relevant_files: tuple[str, ...] = ()) -> dict[str, Any]:

@@ -1,0 +1,90 @@
+{
+  "task_id": "django__django-11133",
+  "best": {
+    "candidate_index": 0,
+    "candidate_dir": "/inspire/hdd/project/machine-behavior/czxs25150055/codefixer-baseline/outputs/local_runs/feedback_candidates_django44_v2/django__django-11133/candidate_0",
+    "patch_chars": 942,
+    "patch_apply": true,
+    "visible_pass": "NA",
+    "score": 124.0,
+    "failure_summary": "",
+    "duration_sec": 1.6882,
+    "empty_patch": false,
+    "malformed_patch": false,
+    "valid_unified_diff": true,
+    "test_file_edit": false,
+    "artifact_file_edit": false,
+    "submission_compliant": true,
+    "patch_files": 1,
+    "changed_files": [
+      "django/http/response.py"
+    ],
+    "patch_lines": 5,
+    "unsafe_edit": false,
+    "irrelevant_file_edits": 0,
+    "workdir_drift": false,
+    "benchmark_artifact_exposure": false,
+    "benchmark_artifact_content_access": false,
+    "selection_compliant": true,
+    "agent_returncode": 0
+  },
+  "candidates": [
+    {
+      "candidate_index": 0,
+      "candidate_dir": "/inspire/hdd/project/machine-behavior/czxs25150055/codefixer-baseline/outputs/local_runs/feedback_candidates_django44_v2/django__django-11133/candidate_0",
+      "patch_chars": 942,
+      "patch_apply": true,
+      "visible_pass": "NA",
+      "score": 124.0,
+      "failure_summary": "",
+      "duration_sec": 1.6882,
+      "empty_patch": false,
+      "malformed_patch": false,
+      "valid_unified_diff": true,
+      "test_file_edit": false,
+      "artifact_file_edit": false,
+      "submission_compliant": true,
+      "patch_files": 1,
+      "changed_files": [
+        "django/http/response.py"
+      ],
+      "patch_lines": 5,
+      "unsafe_edit": false,
+      "irrelevant_file_edits": 0,
+      "workdir_drift": false,
+      "benchmark_artifact_exposure": false,
+      "benchmark_artifact_content_access": false,
+      "selection_compliant": true,
+      "agent_returncode": 0
+    },
+    {
+      "candidate_index": 1,
+      "candidate_dir": "/inspire/hdd/project/machine-behavior/czxs25150055/codefixer-baseline/outputs/local_runs/feedback_candidates_django44_v2/django__django-11133/candidate_1",
+      "patch_chars": 3320,
+      "patch_apply": true,
+      "visible_pass": "NA",
+      "score": -132.0,
+      "failure_summary": "",
+      "duration_sec": 1.7197,
+      "empty_patch": false,
+      "malformed_patch": false,
+      "valid_unified_diff": true,
+      "test_file_edit": true,
+      "artifact_file_edit": false,
+      "submission_compliant": false,
+      "patch_files": 2,
+      "changed_files": [
+        "django/http/response.py",
+        "test_memoryview_fix.py"
+      ],
+      "patch_lines": 59,
+      "unsafe_edit": true,
+      "irrelevant_file_edits": 1,
+      "workdir_drift": false,
+      "benchmark_artifact_exposure": false,
+      "benchmark_artifact_content_access": false,
+      "selection_compliant": false,
+      "agent_returncode": 0
+    }
+  ]
+}

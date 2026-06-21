@@ -1,12 +1,13 @@
 from __future__ import annotations
 
+import json
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from codefixer_baseline.local_eval import analyze_patch, summarize_system
+from codefixer_baseline.local_eval import analyze_patch, run_shell, summarize_system, write_command_log
 
 
 def test_analyze_patch_detects_section_63_metrics() -> None:
@@ -64,3 +65,16 @@ def test_summarize_system_computes_pass_at_k_and_rates() -> None:
     assert summary["visible_test_pass_rate"] == 1.0
     assert summary["hidden_regression_test_pass_rate"] == 0.6667
     assert summary["unsafe_edit_rate"] == 0.3333
+
+
+def test_write_command_log_records_actual_command_metadata(tmp_path: Path) -> None:
+    result = run_shell("python --version", tmp_path, timeout_sec=10)
+    write_command_log(tmp_path, "version check", result)
+
+    meta = json.loads((tmp_path / "version_check.meta.json").read_text(encoding="utf-8"))
+    assert meta["command"] == "python --version"
+    assert meta["cwd"] == str(tmp_path)
+    assert meta["timeout_sec"] == 10
+    assert isinstance(meta["duration_sec"], float)
+    assert (tmp_path / "version_check.stdout.txt").exists()
+    assert (tmp_path / "version_check.stderr.txt").exists()

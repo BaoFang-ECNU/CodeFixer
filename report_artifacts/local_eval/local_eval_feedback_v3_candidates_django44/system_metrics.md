@@ -1,0 +1,3 @@
+| system | num_tasks | num_candidates | pass_at_1 | pass_at_k | visible_test_pass_rate | fix_test_pass_rate | regression_test_pass_rate | hidden_regression_test_pass_rate | average_tool_calls | average_test_runs | average_patch_lines | average_patch_files | unsafe_edit_rate | submission_compliance_rate | empty_patch_rate | artifact_exposure_rate | average_cost | average_wall_time_sec | total_wall_time_sec |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| feedback_v3_candidates_django44 | 44 | 88 | 0.25 | 0.2727 | NA | 0.2875 | 0.6582 | 0.2375 | 101.6932 | 2.75 | 303.4886 | 1.4318 | 0.2727 | 0.3636 | 0.0909 | 0.0 | 0.0 | 52.5992 | 4628.7272 |

@@ -1,0 +1,60 @@
+# Baseline patch output protocol for mini-SWE-agent.
+#
+# This file is intentionally not a feedback/learning module. It only states the
+# SWE-bench submission contract inside the task prompt so the model is asked to
+# produce a machine-applicable unified diff at generation time.
+#
+# Use after the built-in SWE-bench configs, for example:
+#   mini-extra swebench \
+#     -c .../swebench.yaml \
+#     -c .../swebench_modal.yaml \
+#     -c configs/qwen3_vllm_mini_swe.yaml \
+#     -c configs/patch_protocol_mini_swe.yaml \
+#     ...
+
+agent:
+  instance_template: |
+    <pr_description>
+    Consider the following issue:
+    {{task}}
+    </pr_description>
+
+    <instructions>
+    You are a software engineer fixing the issue in the current repository.
+
+    ## Scope
+    - Modify only source files needed for the fix.
+    - Do not modify tests, benchmark artifacts, generated caches, or temporary files.
+    - Do not create or leave reproduction/debug scripts, backup files, or patch files in the final diff.
+    - Do not hard-code benchmark answers.
+
+    ## Workflow
+    1. Inspect the relevant source files with concise commands.
+    2. Make the smallest correct source-code change.
+    3. Run reasonable local checks when useful.
+    4. Before finishing, remove temporary files and inspect the final diff.
+
+    ## Mandatory Patch Submission Protocol
+    Your final submitted output MUST be a valid unified git diff that can be
+    applied with `git apply`.
+
+    When you are ready to finish, follow these steps with separate commands:
+
+    Step 1: Create the final patch from the working tree:
+    `git diff --binary > /tmp/final.patch`
+
+    Step 2: Verify it is non-empty and only changes intended source files:
+    `test -s /tmp/final.patch && sed -n '1,80p' /tmp/final.patch`
+
+    Step 3: Verify it is syntactically applicable:
+    `git apply --check /tmp/final.patch`
+
+    Step 4: Submit with this exact command:
+    `echo COMPLETE_TASK_AND_SUBMIT_FINAL_OUTPUT && cat /tmp/final.patch`
+
+    Critical final-output rules:
+    - The output after `COMPLETE_TASK_AND_SUBMIT_FINAL_OUTPUT` must contain only the unified diff.
+    - Do not include summaries, explanations, Markdown fences, bullet lists, or natural language in the final patch output.
+    - The first non-empty patch line must look like `diff --git a/path b/path`.
+    - If there is no valid source-code fix, submit an empty patch rather than a natural-language explanation.
+    </instructions>

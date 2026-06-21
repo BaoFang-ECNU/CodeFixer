@@ -1,0 +1,30 @@
+date: Sun Jun 21 07:23:12 UTC 2026
+pwd: /inspire/hdd/project/machine-behavior/czxs25150055/codefixer-baseline
+
+git status:
+?? ../.Trash-0/
+?? ../CodeFixer-main/
+?? ../__pycache__/
+?? ../codefixer-baseline.zip
+?? ./
+?? ../dockerd.log
+?? ../modal_docker_check.py
+?? ../modal_smoke.py
+
+python:
+/usr/bin/python
+Python 3.12.3
+
+mini:
+/usr/local/bin/mini
+👋 This is mini-swe-agent version 2.4.1.
+Check the v2 migration guide at https://klieret.short.gy/mini-v2-migration
+Loading global config from '/root/.config/mini-swe-agent/.env'
+👋 This is mini-swe-agent version 2.4.1.
+Check the v2 migration guide at https://klieret.short.gy/mini-v2-migration
+Loading global config from '/root/.config/mini-swe-agent/.env'
+                                                                                                                                          
+ Usage: mini [OPTIONS]                                                                                                                    
+
+vllm model endpoint:
+{"object":"list","data":[{"id":"qwen3-coder-30b-a3b","object":"model","created":1782026592,"owned_by":"vllm","root":"/inspire/ssd/project/machine-behavior/czxs25150055/models/qwen3-coder-30b-a3b","parent":null,"max_model_len":49152,"permission":[{"id":"modelperm-a1fb7b07c46145afb77576308939728f","object":"model_permission","created":1782026592,"allow_create_engine":false,"allow_sampling":true,"allow_logprobs":true,"allow_search_indices":false,"allow_view":true,"allow_fine_tuning":false,"organization":"*","group":null,"is_blocking":false}]}]}

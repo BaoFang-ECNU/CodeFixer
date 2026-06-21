@@ -1,0 +1,91 @@
+{
+  "task_id": "django__django-12125",
+  "best": {
+    "candidate_index": 1,
+    "candidate_dir": "/inspire/hdd/project/machine-behavior/czxs25150055/codefixer-baseline/outputs/local_runs/feedback_candidates_django44_v2/django__django-12125/candidate_1",
+    "patch_chars": 10122,
+    "patch_apply": false,
+    "visible_pass": "NA",
+    "score": -148.1,
+    "failure_summary": "error: patch failed: django/db/migrations/serializer.py:89\nerror: django/db/migrations/serializer.py: patch does not apply",
+    "duration_sec": 1.7835,
+    "empty_patch": false,
+    "malformed_patch": false,
+    "valid_unified_diff": true,
+    "test_file_edit": false,
+    "artifact_file_edit": false,
+    "submission_compliant": true,
+    "patch_files": 1,
+    "changed_files": [
+      "django/db/migrations/serializer.py"
+    ],
+    "patch_lines": 191,
+    "unsafe_edit": false,
+    "irrelevant_file_edits": 0,
+    "workdir_drift": true,
+    "benchmark_artifact_exposure": false,
+    "benchmark_artifact_content_access": false,
+    "selection_compliant": false,
+    "agent_returncode": 0
+  },
+  "candidates": [
+    {
+      "candidate_index": 0,
+      "candidate_dir": "/inspire/hdd/project/machine-behavior/czxs25150055/codefixer-baseline/outputs/local_runs/feedback_candidates_django44_v2/django__django-12125/candidate_0",
+      "patch_chars": 1519,
+      "patch_apply": true,
+      "visible_pass": "NA",
+      "score": -183.0,
+      "failure_summary": "",
+      "duration_sec": 19.9361,
+      "empty_patch": false,
+      "malformed_patch": false,
+      "valid_unified_diff": true,
+      "test_file_edit": true,
+      "artifact_file_edit": false,
+      "submission_compliant": false,
+      "patch_files": 3,
+      "changed_files": [
+        "manage.py",
+        "settings.py",
+        "test_model.py"
+      ],
+      "patch_lines": 45,
+      "unsafe_edit": true,
+      "irrelevant_file_edits": 3,
+      "workdir_drift": true,
+      "benchmark_artifact_exposure": false,
+      "benchmark_artifact_content_access": false,
+      "selection_compliant": false,
+      "agent_returncode": 0
+    },
+    {
+      "candidate_index": 1,
+      "candidate_dir": "/inspire/hdd/project/machine-behavior/czxs25150055/codefixer-baseline/outputs/local_runs/feedback_candidates_django44_v2/django__django-12125/candidate_1",
+      "patch_chars": 10122,
+      "patch_apply": false,
+      "visible_pass": "NA",
+      "score": -148.1,
+      "failure_summary": "error: patch failed: django/db/migrations/serializer.py:89\nerror: django/db/migrations/serializer.py: patch does not apply",
+      "duration_sec": 1.7835,
+      "empty_patch": false,
+      "malformed_patch": false,
+      "valid_unified_diff": true,
+      "test_file_edit": false,
+      "artifact_file_edit": false,
+      "submission_compliant": true,
+      "patch_files": 1,
+      "changed_files": [
+        "django/db/migrations/serializer.py"
+      ],
+      "patch_lines": 191,
+      "unsafe_edit": false,
+      "irrelevant_file_edits": 0,
+      "workdir_drift": true,
+      "benchmark_artifact_exposure": false,
+      "benchmark_artifact_content_access": false,
+      "selection_compliant": false,
+      "agent_returncode": 0
+    }
+  ]
+}

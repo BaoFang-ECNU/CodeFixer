@@ -38,6 +38,22 @@ mini-extra swebench-single --help
 mini --help
 ```
 
+Initialize mini-SWE-agent's global config after a fresh environment restart:
+
+```bash
+bash scripts/setup_mini_config.sh
+```
+
+This writes `/root/.config/mini-swe-agent/.env` with:
+
+- `MSWEA_MODEL_NAME=hosted_vllm/qwen3-coder-30b-a3b`
+- `MSWEA_MODEL_API_KEY_NAME=OPENAI_API_KEY`
+- `OPENAI_API_KEY=dummy`
+
+`mini --help` must not show the quickstart prompt. If it asks for "Enter your
+default model" or "Enter your API key name", run `bash scripts/setup_mini_config.sh`
+again before batch experiments.
+
 mini-SWE-agent CLI flags and YAML schema may change across versions. If they differ, edit `scripts/run_single.sh`, `scripts/run_slice.sh`, and `configs/qwen3_vllm_mini_swe.yaml`.
 
 ## Launch Qwen3 With vLLM
@@ -118,6 +134,39 @@ If `preds.json` is missing, the script tries the matching `preds.jsonl`. To insp
 find outputs/runs -type f
 ```
 
+Before official submission, audit the prediction file for the patch output
+protocol:
+
+```bash
+python scripts/audit_predictions.py outputs/runs/qwen3_lite_test_0_5/preds.json \
+  --output-csv outputs/qwen3_lite_test_0_5_patch_protocol.csv
+```
+
+Malformed natural-language outputs are counted as baseline failures. For a
+strict submission file that replaces non-compliant patches with empty patches:
+
+```bash
+python scripts/audit_predictions.py outputs/runs/qwen3_lite_test_0_5/preds.json \
+  --write-strict-preds outputs/runs/qwen3_lite_test_0_5/preds.strict.json
+```
+
+To run an LLM-based patch sanitization pass over an existing local run directory
+without regenerating trajectories:
+
+```bash
+python scripts/llm_sanitize_patches.py \
+  --runs-dir outputs/local_runs/baseline_raw_49152_llm_sanitized \
+  --api-base http://127.0.0.1:8001/v1 \
+  --model qwen3-coder-30b-a3b \
+  --max-tokens 4096 \
+  --report-csv outputs/summary/llm_sanitize_report.csv
+```
+
+This is a submission-formatting pass, not a feedback or repair pass: it should
+remove prose, malformed patch text, temporary reproduction files, and test
+edits while preserving only source-code changes already present in the
+candidate patch.
+
 ## Inspect And Summarize Outputs
 
 ```bash
@@ -158,6 +207,28 @@ Fixed V0 settings:
 - No training
 - No fine-tuning
 - No paid API
+- Patch output protocol audit before official submission
+
+For mini-SWE-agent/SWE-ReX runs, include the baseline patch protocol config
+after the built-in SWE-bench configs:
+
+```bash
+mini-extra swebench \
+  -c /usr/local/lib/python3.12/dist-packages/minisweagent/config/benchmarks/swebench.yaml \
+  -c /usr/local/lib/python3.12/dist-packages/minisweagent/config/benchmarks/swebench_modal.yaml \
+  -c configs/qwen3_vllm_mini_swe.yaml \
+  -c configs/patch_protocol_mini_swe.yaml \
+  -c model.model_class=litellm \
+  -c model.model_name=hosted_vllm/qwen3-coder-30b-a3b \
+  -c model.model_kwargs.api_base=http://127.0.0.1:8001/v1 \
+  -c model.model_kwargs.max_tokens=4096 \
+  --subset lite \
+  --split test \
+  --slice 6:50 \
+  --workers 1 \
+  --environment-class swerex_modal \
+  -o runs/qwen3coder30b_lite_modal_django44_protocol
+```
 
 See [docs/baseline_protocol.md](docs/baseline_protocol.md) for the experiment protocol.
 
@@ -189,6 +260,52 @@ python scripts/evaluate_local.py --manifest configs/local_eval_swebench_lite.yam
 ```
 
 This is a fallback benchmark, not official SWE-bench scoring.
+
+## Local +Feedback Variant
+
+The `+feedback` variant keeps the baseline runner intact and adds a separate
+multi-candidate controller:
+
+- candidate generation with mini-SWE-agent
+- patch compliance checks
+- visible-test execution when a visible command is available
+- compact failure summaries for the next candidate
+- candidate reranking into a selected output directory
+
+It does not use hidden tests for feedback.
+
+Run one task:
+
+```bash
+python scripts/run_feedback_task.py django__django-10914 \
+  --candidate-system feedback_candidates_django44 \
+  --selected-system feedback_django44 \
+  --attempts 2 \
+  --step-limit 1000 \
+  --max-tokens 4096 \
+  --timeout-sec 1800
+```
+
+Run the Django slice:
+
+```bash
+python scripts/run_feedback_batch.py \
+  --manifest configs/local_eval_swebench_lite.yaml \
+  --candidate-system feedback_candidates_django44 \
+  --selected-system feedback_django44 \
+  --start 6 \
+  --limit 44 \
+  --attempts 2 \
+  --step-limit 1000 \
+  --max-tokens 4096 \
+  --timeout-sec 1800 \
+  --continue-on-error
+```
+
+Candidate attempts are saved under `outputs/local_runs/feedback_candidates_django44`.
+The reranked best patch for each task is saved under
+`outputs/local_runs/feedback_django44`, which can be evaluated with the same
+local evaluator as the baseline.
 
 ## Troubleshooting
 

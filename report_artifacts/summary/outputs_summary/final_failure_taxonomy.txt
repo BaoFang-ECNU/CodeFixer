@@ -1,0 +1,36 @@
+===== outputs/local_eval_old9_raw_probe =====
+      1 "empty_patch;workdir_drift;patch_apply_failed;error: No valid patches in input (allow with ""--allow-empty"")"
+      3 NA
+      1 benchmark_artifact_exposure
+      1 benchmark_artifact_exposure;fix_failed
+     12 fix_failed
+      8 fix_failed;regression_failed
+      1 notes
+      1 patch_apply_failed;error: patch failed: django/contrib/auth/migrations/0011_update_proxy_permissions.py:24 error: django/contrib/auth/migrations/0011_update_proxy_permissions.py: patch does not apply
+      1 patch_apply_failed;error: test_models.py: already exists in working directory
+      2 regression_failed
+      5 workdir_drift
+      5 workdir_drift;fix_failed
+      4 workdir_drift;fix_failed;regression_failed
+===== outputs/local_eval_feedback_django44_v2 =====
+      1 "empty_patch;patch_apply_failed;error: No valid patches in input (allow with ""--allow-empty"")"
+      7 NA
+      8 fix_failed
+      5 fix_failed;regression_failed
+      1 notes
+      1 regression_failed
+      5 workdir_drift
+      9 workdir_drift;fix_failed
+      6 workdir_drift;fix_failed;regression_failed
+      1 workdir_drift;patch_apply_failed;error: manage.py: already exists in working directory error: test_settings.py: already exists in working directory
+      1 workdir_drift;patch_apply_failed;error: patch failed: django/db/migrations/serializer.py:89 error: django/db/migrations/serializer.py: patch does not apply
+===== outputs/local_eval_feedback_v3_django44 =====
+      1 "empty_patch;patch_apply_failed;error: No valid patches in input (allow with ""--allow-empty"")"
+     10 NA
+     10 fix_failed
+      6 fix_failed;regression_failed
+      1 notes
+      2 regression_failed
+      2 workdir_drift
+      7 workdir_drift;fix_failed
+      6 workdir_drift;fix_failed;regression_failed
