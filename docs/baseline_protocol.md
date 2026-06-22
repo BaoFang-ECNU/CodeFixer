@@ -174,12 +174,19 @@ visible test result, patch compliance, patch size, unsafe edits, workdir drift,
 and artifact exposure. Hidden tests, reference patches, official verdicts, and
 benchmark artifacts are never used as training feedback.
 
-The controller supports two Thompson-sampling variants:
+The controller supports three Thompson-sampling variants:
 
 - `bandit`: a global bandit shared across all failure modes.
 - `contextual_bandit`: a contextual bandit whose state is keyed by the previous
   candidate's failure type, such as `patch_not_apply`, `assertion_error`,
   `syntax_error`, `import_error`, `timeout`, and `unsafe_or_noncompliant`.
+- `hierarchical_bandit`: a HierTS-lite controller that keeps the same contextual
+  state but smooths sparse context-local posteriors with the global arm
+  posterior. For context `c` and arm `a`, it samples from
+  `Beta(alpha_local(c,a) + lambda_c * alpha_global(a),
+  beta_local(c,a) + lambda_c * beta_global(a))`, where
+  `lambda_c = tau / (tau + n_c)`. This lets early or rare failure contexts borrow
+  global prompt-policy evidence while gradually trusting local context data.
 
 Example global-bandit command:
 
@@ -214,6 +221,28 @@ python scripts/run_feedback_batch.py \
   --prompt-controller contextual_bandit \
   --bandit-state outputs/feedback_v4_contextual_django44_reports/bandit_state.json \
   --bandit-seed 29 \
+  --start 6 \
+  --limit 44 \
+  --attempts 4 \
+  --step-limit 1000 \
+  --max-tokens 4096 \
+  --timeout-sec 1800 \
+  --continue-on-error
+```
+
+Example HierTS-lite command:
+
+```bash
+python scripts/run_feedback_batch.py \
+  --manifest configs/local_eval_swebench_lite.yaml \
+  --candidate-system feedback_v4_hier_candidates_django44 \
+  --selected-system feedback_v4_hier_django44 \
+  --feedback-root outputs/feedback_v4_hier_django44_reports \
+  --memory-file outputs/memory/feedback_v2_evolution_memory.clean.md \
+  --prompt-controller hierarchical_bandit \
+  --bandit-state outputs/feedback_v4_hier_django44_reports/bandit_state.json \
+  --bandit-seed 43 \
+  --hier-tau 3.0 \
   --start 6 \
   --limit 44 \
   --attempts 4 \

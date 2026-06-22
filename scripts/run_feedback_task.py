@@ -81,11 +81,12 @@ def main() -> int:
     parser.add_argument("--memory-file", default="", help="Optional evolution memory to prepend to every candidate prompt.")
     parser.add_argument(
         "--prompt-controller",
-        choices=["static", "bandit", "contextual_bandit"],
+        choices=["static", "bandit", "contextual_bandit", "hierarchical_bandit"],
         default="static",
         help=(
             "Prompt policy controller. 'bandit' uses global Thompson sampling; "
-            "'contextual_bandit' conditions Thompson sampling on the previous failure type."
+            "'contextual_bandit' conditions Thompson sampling on the previous failure type; "
+            "'hierarchical_bandit' smooths context-local posteriors with global arm posteriors."
         ),
     )
     parser.add_argument(
@@ -94,6 +95,7 @@ def main() -> int:
         help="Optional JSON state path for bandit arm statistics. Defaults to <feedback-root>/bandit_state.json.",
     )
     parser.add_argument("--bandit-seed", type=int, default=0, help="Random seed for Thompson sampling.")
+    parser.add_argument("--hier-tau", type=float, default=3.0, help="Shared-prior smoothing strength for hierarchical_bandit.")
     parser.add_argument(
         "--feedback-root",
         default=str(PROJECT_ROOT / "outputs" / "feedback"),
@@ -106,7 +108,7 @@ def main() -> int:
     feedback_dir.mkdir(parents=True, exist_ok=True)
     memory_text = load_memory(args.memory_file)
     bandit_state_path = get_bandit_state_path(args)
-    bandit_state = load_bandit_state(bandit_state_path) if args.prompt_controller in {"bandit", "contextual_bandit"} else None
+    bandit_state = load_bandit_state(bandit_state_path, args.hier_tau) if is_bandit_controller(args.prompt_controller) else None
     rng = random.Random(args.bandit_seed + stable_int(args.task_id))
 
     reports: list[dict[str, Any]] = []
@@ -118,7 +120,7 @@ def main() -> int:
         arm_prompt = PROMPT_ARMS[arm_name]
         print(f"[feedback-task] {args.task_id} candidate_{candidate}", flush=True)
         print(f"[feedback-task] prompt_arm={arm_name}", flush=True)
-        if args.prompt_controller == "contextual_bandit":
+        if args.prompt_controller in {"contextual_bandit", "hierarchical_bandit"}:
             print(f"[feedback-task] context_key={context_key}", flush=True)
         candidate_dir = (
             PROJECT_ROOT
@@ -144,9 +146,10 @@ def main() -> int:
         reports.append(report)
 
         if not args.rerank_only:
-            if args.prompt_controller in {"bandit", "contextual_bandit"} and bandit_state is not None:
+            if is_bandit_controller(args.prompt_controller) and bandit_state is not None:
                 reward = bandit_reward(report)
                 update_bandit_state(bandit_state, arm_name, reward, args.prompt_controller, context_key)
+                bandit_state["hier_config"]["tau"] = args.hier_tau
                 save_bandit_state(bandit_state_path, bandit_state)
                 bandit_events.append(
                     {
@@ -158,6 +161,8 @@ def main() -> int:
                         "patch_apply": report["patch_apply"],
                         "visible_pass": report["visible_pass"],
                         "selection_compliant": report.get("selection_compliant"),
+                        "hier_tau": args.hier_tau if args.prompt_controller == "hierarchical_bandit" else "",
+                        "context_count": get_context_count(bandit_state, context_key),
                     }
                 )
             previous_feedback = build_feedback(task, report)
@@ -191,6 +196,7 @@ def main() -> int:
                 "memory_file": args.memory_file,
                 "memory_chars": len(memory_text),
                 "prompt_controller": args.prompt_controller,
+                "hier_tau": args.hier_tau if args.prompt_controller == "hierarchical_bandit" else "",
                 "bandit_state": str(bandit_state_path) if bandit_state_path else "",
                 "bandit_events": bandit_events,
                 "best": best,
@@ -246,7 +252,11 @@ def get_bandit_state_path(args: argparse.Namespace) -> Path:
     return resolve_path(args.feedback_root) / "bandit_state.json"
 
 
-def load_bandit_state(path: Path) -> dict[str, Any]:
+def is_bandit_controller(controller: str) -> bool:
+    return controller in {"bandit", "contextual_bandit", "hierarchical_bandit"}
+
+
+def load_bandit_state(path: Path, hier_tau: float = 3.0) -> dict[str, Any]:
     if path.exists():
         state = json.loads(path.read_text(encoding="utf-8"))
     else:
@@ -255,6 +265,10 @@ def load_bandit_state(path: Path) -> dict[str, Any]:
     contexts = state.setdefault("contexts", {})
     for context_key in DEFAULT_CONTEXT_KEYS:
         initialize_arm_table(contexts.setdefault(context_key, {}))
+    state.setdefault("context_counts", {})
+    hier_config = state.setdefault("hier_config", {})
+    hier_config.setdefault("mode", "shared_prior")
+    hier_config["tau"] = float(hier_tau)
     return state
 
 
@@ -272,6 +286,17 @@ def get_context_arms(state: dict[str, Any], context_key: str) -> dict[str, Any]:
     arms = contexts.setdefault(context_key, {})
     initialize_arm_table(arms)
     return arms
+
+
+def get_context_count(state: dict[str, Any], context_key: str) -> int:
+    return int(state.setdefault("context_counts", {}).get(context_key, 0))
+
+
+def context_lambda(state: dict[str, Any], context_key: str, tau: float | None = None) -> float:
+    if tau is None:
+        tau = float(state.setdefault("hier_config", {}).get("tau", 3.0))
+    n_context = get_context_count(state, context_key)
+    return float(tau) / (float(tau) + n_context)
 
 
 def save_bandit_state(path: Path, state: dict[str, Any]) -> None:
@@ -293,13 +318,15 @@ def select_prompt_arm(
     rng: random.Random,
     context_key: str = "generic_failure",
 ) -> str:
-    if controller not in {"bandit", "contextual_bandit"}:
+    if not is_bandit_controller(controller):
         return "v3_control"
     if candidate == 0:
         return "v3_control"
     assert bandit_state is not None
     if controller == "contextual_bandit":
         arms = get_context_arms(bandit_state, context_key)
+    elif controller == "hierarchical_bandit":
+        arms = effective_hierarchical_arms(bandit_state, context_key)
     else:
         arms = bandit_state["arms"]
     samples = []
@@ -307,6 +334,21 @@ def select_prompt_arm(
         arm = arms[name]
         samples.append((rng.betavariate(float(arm["alpha"]), float(arm["beta"])), name))
     return max(samples, key=lambda item: item[0])[1]
+
+
+def effective_hierarchical_arms(state: dict[str, Any], context_key: str) -> dict[str, dict[str, float]]:
+    local_arms = get_context_arms(state, context_key)
+    global_arms = state["arms"]
+    lam = context_lambda(state, context_key)
+    effective: dict[str, dict[str, float]] = {}
+    for name in DEFAULT_BANDIT_ARMS:
+        local = local_arms[name]
+        glob = global_arms[name]
+        effective[name] = {
+            "alpha": float(local["alpha"]) + lam * float(glob["alpha"]),
+            "beta": float(local["beta"]) + lam * float(glob["beta"]),
+        }
+    return effective
 
 
 def update_bandit_state(
@@ -319,8 +361,20 @@ def update_bandit_state(
     reward = max(0.0, min(1.0, float(reward)))
     if controller == "contextual_bandit":
         arm = get_context_arms(state, context_key)[arm_name]
+        update_arm_counts(arm, reward)
+    elif controller == "hierarchical_bandit":
+        local_arm = get_context_arms(state, context_key)[arm_name]
+        global_arm = state["arms"][arm_name]
+        update_arm_counts(local_arm, reward)
+        update_arm_counts(global_arm, reward)
+        counts = state.setdefault("context_counts", {})
+        counts[context_key] = int(counts.get(context_key, 0)) + 1
     else:
         arm = state["arms"][arm_name]
+        update_arm_counts(arm, reward)
+
+
+def update_arm_counts(arm: dict[str, Any], reward: float) -> None:
     arm["alpha"] = round(float(arm["alpha"]) + reward, 6)
     arm["beta"] = round(float(arm["beta"]) + 1.0 - reward, 6)
     arm["pulls"] = int(arm["pulls"]) + 1
@@ -614,7 +668,12 @@ def write_selected_metadata(dst: Path, args: argparse.Namespace, best: dict[str,
             "feedback_attempts": len(reports),
             "feedback_memory_file": args.memory_file,
             "prompt_controller": args.prompt_controller,
-            "bandit_state": str(get_bandit_state_path(args)) if args.prompt_controller == "bandit" else "",
+            "bandit_state": (
+                str(get_bandit_state_path(args))
+                if is_bandit_controller(args.prompt_controller)
+                else ""
+            ),
+            "hier_tau": args.hier_tau if args.prompt_controller == "hierarchical_bandit" else "",
             "selected_candidate": best["candidate_index"],
             "selected_prompt_arm": best.get("prompt_arm", "v3_control"),
             "selection_score": best["score"],

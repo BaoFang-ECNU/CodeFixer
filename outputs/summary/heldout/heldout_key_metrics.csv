@@ -1,0 +1,4 @@
+alias,system,num_tasks,num_candidates,pass_at_1,pass_at_k,visible_test_pass_rate,fix_test_pass_rate,regression_test_pass_rate,hidden_regression_test_pass_rate,average_tool_calls,average_test_runs,average_patch_lines,average_patch_files,unsafe_edit_rate,submission_compliance_rate,empty_patch_rate,artifact_exposure_rate,average_cost,average_wall_time_sec,total_wall_time_sec
+heldout_v1_raw,heldout_v1_raw_django50,50,50,0.22,0.22,NA,0.3023,0.7073,0.2558,97.76,4.94,332.2,2.34,0.4,0.24,0.14,0.04,0.0,55.5697,2778.4835
+heldout_v3_memory,heldout_v3_memory_django50,50,50,0.28,0.28,NA,0.36,0.6667,0.28,99.08,1.08,451.96,1.24,0.14,0.74,0.0,0.0,0.0,60.1786,3008.93
+heldout_v4_global,heldout_v4_global_django50,50,50,0.34,0.34,NA,0.3673,0.8085,0.3469,90.52,1.36,148.66,1.08,0.1,0.8,0.02,0.0,0.0,49.9581,2497.9067

@@ -400,8 +400,8 @@ def run_shell(command: str, cwd: Path, timeout_sec: int) -> subprocess.Completed
 
 def write_command_log(log_dir: Path, name: str, result: subprocess.CompletedProcess[str]) -> None:
     safe_name = re.sub(r"[^A-Za-z0-9_.-]+", "_", name)
-    (log_dir / f"{safe_name}.stdout.txt").write_text(result.stdout or "", encoding="utf-8", errors="ignore")
-    (log_dir / f"{safe_name}.stderr.txt").write_text(result.stderr or "", encoding="utf-8", errors="ignore")
+    (log_dir / f"{safe_name}.stdout.txt").write_text(_as_text(result.stdout), encoding="utf-8", errors="ignore")
+    (log_dir / f"{safe_name}.stderr.txt").write_text(_as_text(result.stderr), encoding="utf-8", errors="ignore")
     (log_dir / f"{safe_name}.meta.json").write_text(
         json.dumps(
             {
@@ -468,6 +468,14 @@ def _command_to_string(args: Any) -> str:
     if isinstance(args, (list, tuple)):
         return " ".join(str(item) for item in args)
     return str(args)
+
+
+def _as_text(value: Any) -> str:
+    if value is None:
+        return ""
+    if isinstance(value, bytes):
+        return value.decode("utf-8", errors="replace")
+    return str(value)
 
 
 def analyze_patch(patch_text: str, relevant_files: tuple[str, ...] = ()) -> dict[str, Any]:

@@ -1,0 +1,2 @@
+| run_name | subset | split | slice | model | agent | temperature | step_limit | num_instances | num_resolved | resolved_rate | avg_steps | avg_cost | avg_wall_time | num_failed_runtime | num_failed_eval | notes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |

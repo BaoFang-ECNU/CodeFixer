@@ -27,12 +27,13 @@ def main() -> int:
     parser.add_argument("--memory-file", default="", help="Optional evolution memory file passed to each task.")
     parser.add_argument(
         "--prompt-controller",
-        choices=["static", "bandit", "contextual_bandit"],
+        choices=["static", "bandit", "contextual_bandit", "hierarchical_bandit"],
         default="static",
         help="Prompt policy controller passed to each task.",
     )
     parser.add_argument("--bandit-state", default="", help="Optional JSON state path for bandit arm statistics.")
     parser.add_argument("--bandit-seed", type=int, default=0, help="Random seed for Thompson sampling.")
+    parser.add_argument("--hier-tau", type=float, default=3.0, help="Shared-prior smoothing strength for hierarchical_bandit.")
     parser.add_argument(
         "--feedback-root",
         default=str(PROJECT_ROOT / "outputs" / "feedback"),
@@ -72,6 +73,8 @@ def main() -> int:
             args.prompt_controller,
             "--bandit-seed",
             str(args.bandit_seed),
+            "--hier-tau",
+            str(args.hier_tau),
         ]
         if args.rerank_only:
             cmd.append("--rerank-only")

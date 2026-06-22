@@ -1,0 +1,70 @@
+===== outputs/local_eval_old9_raw_probe =====
+      1 "empty_patch;workdir_drift;patch_apply_failed;error: No valid patches in input (allow with ""--allow-empty"")"
+      3 NA
+      1 benchmark_artifact_exposure
+      1 benchmark_artifact_exposure;fix_failed
+     12 fix_failed
+      8 fix_failed;regression_failed
+      1 notes
+      1 patch_apply_failed;error: patch failed: django/contrib/auth/migrations/0011_update_proxy_permissions.py:24 error: django/contrib/auth/migrations/0011_update_proxy_permissions.py: patch does not apply
+      1 patch_apply_failed;error: test_models.py: already exists in working directory
+      2 regression_failed
+      5 workdir_drift
+      5 workdir_drift;fix_failed
+      4 workdir_drift;fix_failed;regression_failed
+===== outputs/local_eval_feedback_v3_django44 =====
+      1 "empty_patch;patch_apply_failed;error: No valid patches in input (allow with ""--allow-empty"")"
+     10 NA
+     10 fix_failed
+      6 fix_failed;regression_failed
+      1 notes
+      2 regression_failed
+      2 workdir_drift
+      7 workdir_drift;fix_failed
+      6 workdir_drift;fix_failed;regression_failed
+===== outputs/local_eval_feedback_v4_bandit_django44 =====
+     11 NA
+     15 fix_failed
+     10 fix_failed;regression_failed
+      1 notes
+      1 regression_failed
+      1 workdir_drift
+      1 workdir_drift;fix_failed
+      3 workdir_drift;fix_failed;regression_failed
+      1 workdir_drift;patch_apply_failed;error: patch failed: django/db/migrations/serializer.py:327 error: django/db/migrations/serializer.py: patch does not apply
+      1 workdir_drift;patch_apply_failed;error: patch failed: django/db/models/deletion.py:272 error: django/db/models/deletion.py: patch does not apply
+===== outputs/local_eval_feedback_v4_contextual_django44 =====
+     10 NA
+     19 fix_failed
+      7 fix_failed;regression_failed
+      1 notes
+      2 regression_failed
+      1 workdir_drift
+      1 workdir_drift;fix_failed
+      3 workdir_drift;fix_failed;regression_failed
+      1 workdir_drift;regression_failed
+===== outputs/local_eval_feedback_v4_hier_django44 =====
+      8 NA
+     16 fix_failed
+     10 fix_failed;regression_failed
+      1 notes
+      1 patch_apply_failed;error: patch failed: django/contrib/auth/validators.py:7 error: django/contrib/auth/validators.py: patch does not apply
+      1 patch_apply_failed;error: patch failed: django/core/checks/translation.py:52 error: django/core/checks/translation.py: patch does not apply
+      1 patch_apply_failed;error: patch failed: django/db/models/deletion.py:277 error: django/db/models/deletion.py: patch does not apply
+      2 regression_failed
+      1 workdir_drift
+      3 workdir_drift;fix_failed;regression_failed
+      1 workdir_drift;regression_failed
+===== outputs/local_eval_feedback_v4_hier_tau10_django44 =====
+      7 NA
+     12 fix_failed
+     11 fix_failed;regression_failed
+      1 notes
+      1 patch_apply_failed;error: patch failed: django/contrib/auth/validators.py:7 error: django/contrib/auth/validators.py: patch does not apply
+      1 patch_apply_failed;error: patch failed: django/db/models/deletion.py:277 error: django/db/models/deletion.py: patch does not apply
+      1 regression_failed
+      3 workdir_drift
+      3 workdir_drift;fix_failed
+      2 workdir_drift;fix_failed;regression_failed
+      1 workdir_drift;patch_apply_failed;error: patch failed: django/db/models/sql/query.py:1636 error: django/db/models/sql/query.py: patch does not apply
+      1 workdir_drift;regression_failed

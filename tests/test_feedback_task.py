@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import argparse
 import importlib.util
+import json
 from pathlib import Path
 
 
@@ -136,6 +138,7 @@ def test_select_prompt_arm_uses_control_first_candidate() -> None:
     rng = __import__("random").Random(7)
     assert run_feedback_task.select_prompt_arm("bandit", 0, state, rng) == "v3_control"
     assert run_feedback_task.select_prompt_arm("contextual_bandit", 0, state, rng, "assertion_error") == "v3_control"
+    assert run_feedback_task.select_prompt_arm("hierarchical_bandit", 0, state, rng, "assertion_error") == "v3_control"
     assert run_feedback_task.select_prompt_arm("static", 3, state, rng) == "v3_control"
 
 
@@ -197,3 +200,99 @@ def test_contextual_bandit_updates_context_arm_independently(tmp_path: Path) -> 
     assert state["contexts"]["syntax_error"]["minimal_patch"]["pulls"] == 1
     assert state["contexts"]["syntax_error"]["minimal_patch"]["alpha"] == 1.25
     assert state["contexts"]["syntax_error"]["minimal_patch"]["beta"] == 1.75
+
+
+def test_hierarchical_bandit_initializes_shared_prior_config(tmp_path: Path) -> None:
+    state = run_feedback_task.load_bandit_state(tmp_path / "bandit_state.json", hier_tau=5.0)
+    assert "arms" in state
+    assert "contexts" in state
+    assert "context_counts" in state
+    assert state["hier_config"]["mode"] == "shared_prior"
+    assert state["hier_config"]["tau"] == 5.0
+    assert run_feedback_task.context_lambda(state, "assertion_error") == 1.0
+
+
+def test_hierarchical_bandit_effective_arms_use_global_prior(tmp_path: Path) -> None:
+    state = run_feedback_task.load_bandit_state(tmp_path / "bandit_state.json", hier_tau=3.0)
+    state["arms"]["minimal_patch"]["alpha"] = 4.0
+    state["arms"]["minimal_patch"]["beta"] = 2.0
+
+    effective = run_feedback_task.effective_hierarchical_arms(state, "assertion_error")
+    assert effective["minimal_patch"]["alpha"] == 5.0
+    assert effective["minimal_patch"]["beta"] == 3.0
+
+    state["context_counts"]["assertion_error"] = 3
+    effective_after_context_data = run_feedback_task.effective_hierarchical_arms(state, "assertion_error")
+    assert effective_after_context_data["minimal_patch"]["alpha"] == 3.0
+    assert effective_after_context_data["minimal_patch"]["beta"] == 2.0
+
+
+def test_hierarchical_bandit_updates_local_global_and_context_count(tmp_path: Path) -> None:
+    state = run_feedback_task.load_bandit_state(tmp_path / "bandit_state.json")
+    run_feedback_task.update_bandit_state(
+        state,
+        "minimal_patch",
+        0.75,
+        controller="hierarchical_bandit",
+        context_key="assertion_error",
+    )
+
+    local_arm = state["contexts"]["assertion_error"]["minimal_patch"]
+    syntax_arm = state["contexts"]["syntax_error"]["minimal_patch"]
+    global_arm = state["arms"]["minimal_patch"]
+
+    assert local_arm["pulls"] == 1
+    assert local_arm["alpha"] == 1.75
+    assert local_arm["beta"] == 1.25
+    assert global_arm["pulls"] == 1
+    assert global_arm["alpha"] == 1.75
+    assert global_arm["beta"] == 1.25
+    assert syntax_arm["pulls"] == 0
+    assert state["context_counts"]["assertion_error"] == 1
+    assert run_feedback_task.context_lambda(state, "assertion_error") == 0.75
+
+
+def test_selected_metadata_records_contextual_bandit_state(tmp_path: Path) -> None:
+    selected = tmp_path / "candidate_0"
+    selected.mkdir()
+    args = argparse.Namespace(
+        selected_system="feedback_v4_contextual",
+        candidate_system="feedback_v4_contextual_candidates",
+        feedback_root=str(tmp_path / "feedback_reports"),
+        memory_file="outputs/memory/memory.md",
+        prompt_controller="contextual_bandit",
+        bandit_state=str(tmp_path / "feedback_reports" / "bandit_state.json"),
+    )
+    best = {
+        "candidate_index": 2,
+        "prompt_arm": "minimal_patch",
+        "score": 0.5,
+    }
+    run_feedback_task.write_selected_metadata(selected, args, best, reports=[best])
+    metadata = json.loads((selected / "metadata.json").read_text(encoding="utf-8"))
+    assert metadata["prompt_controller"] == "contextual_bandit"
+    assert metadata["bandit_state"].endswith("bandit_state.json")
+
+
+def test_selected_metadata_records_hierarchical_bandit_state(tmp_path: Path) -> None:
+    selected = tmp_path / "candidate_0"
+    selected.mkdir()
+    args = argparse.Namespace(
+        selected_system="feedback_v4_hier",
+        candidate_system="feedback_v4_hier_candidates",
+        feedback_root=str(tmp_path / "feedback_reports"),
+        memory_file="outputs/memory/memory.md",
+        prompt_controller="hierarchical_bandit",
+        bandit_state=str(tmp_path / "feedback_reports" / "bandit_state.json"),
+        hier_tau=3.0,
+    )
+    best = {
+        "candidate_index": 1,
+        "prompt_arm": "minimal_patch",
+        "score": 0.75,
+    }
+    run_feedback_task.write_selected_metadata(selected, args, best, reports=[best])
+    metadata = json.loads((selected / "metadata.json").read_text(encoding="utf-8"))
+    assert metadata["prompt_controller"] == "hierarchical_bandit"
+    assert metadata["bandit_state"].endswith("bandit_state.json")
+    assert metadata["hier_tau"] == 3.0

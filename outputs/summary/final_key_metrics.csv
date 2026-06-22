@@ -1,0 +1,14 @@
+alias,system,num_tasks,num_candidates,pass_at_1,pass_at_k,visible_test_pass_rate,fix_test_pass_rate,regression_test_pass_rate,hidden_regression_test_pass_rate,average_tool_calls,average_test_runs,average_patch_lines,average_patch_files,unsafe_edit_rate,submission_compliance_rate,empty_patch_rate,artifact_exposure_rate,average_cost,average_wall_time_sec,total_wall_time_sec
+baseline_raw,old_raw,44,44,0.2045,0.2045,NA,0.2683,0.65,0.2195,89.6364,3.5909,502.3636,2.5455,0.7273,0.1364,0.0227,0.0455,0.0,86.4614,3804.3018
+v3_memory,feedback_v3_django44,44,44,0.2727,0.2727,NA,0.3256,0.6667,0.2791,100.0682,3.0,230.5227,1.25,0.1591,0.5227,0.0227,0.0,0.0,50.5269,2223.1857
+v3_memory_candidates,feedback_v3_candidates_django44,44,88,0.25,0.2727,NA,0.2875,0.6582,0.2375,101.6932,2.75,303.4886,1.4318,0.2727,0.3636,0.0909,0.0,0.0,52.5992,4628.7272
+v3_static4,feedback_v3_static4_django44,44,44,0.1591,0.1591,NA,0.1905,0.6341,0.1667,97.8864,3.4545,263.0455,1.1364,0.0682,0.7727,0.0227,0.0,0.0,56.4743,2484.8701
+v3_static4_candidates,feedback_v3_static4_candidates_django44,44,176,0.1364,0.3182,NA,0.255,0.6897,0.2148,107.4943,4.4148,434.7045,1.4432,0.2784,0.3807,0.1477,0.0,0.0,66.8686,11768.8688
+v4_global,feedback_v4_bandit_django44,44,44,0.2727,0.2727,NA,0.3095,0.6585,0.2857,98.8409,3.5227,178.2727,1.2273,0.1136,0.75,0.0,0.0,0.0,56.3037,2477.363
+v4_global_candidates,feedback_v4_bandit_candidates_django44,44,176,0.2045,0.3636,NA,0.3197,0.7014,0.2789,105.983,4.9034,585.8466,1.6477,0.2955,0.4091,0.1193,0.0,0.0,69.0666,12155.7219
+v4_contextual,feedback_v4_contextual_django44,44,44,0.25,0.25,NA,0.3182,0.6977,0.25,97.2045,2.5227,138.5682,1.1136,0.0682,0.7955,0.0,0.0,0.0,45.8989,2019.55
+v4_contextual_candidates,feedback_v4_contextual_candidates_django44,44,176,0.1818,0.3409,NA,0.2829,0.6711,0.2368,104.6023,2.3068,315.1761,1.4943,0.2898,0.4034,0.1136,0.0114,0.0,57.4644,10113.7257
+v4_hier_tau3,feedback_v4_hier_django44,44,44,0.2045,0.2045,NA,0.2927,0.6,0.2195,106.9545,3.5455,306.6364,1.2727,0.0682,0.7727,0.0,0.0,0.0,54.4134,2394.1916
+v4_hier_tau3_candidates,feedback_v4_hier_candidates_django44,44,175,0.2727,0.2955,NA,0.2533,0.637,0.1933,113.0971,3.4971,337.9429,1.5886,0.2971,0.4,0.0629,0.0229,0.0,63.4536,11104.3774
+v4_hier_tau10,feedback_v4_hier_tau10_django44,44,43,0.2273,0.2273,NA,0.3,0.6154,0.25,97.7907,1.3953,80.5116,1.0233,0.0,0.7209,0.0,0.0,0.0,49.7134,2137.6759
+v4_hier_tau10_candidates,feedback_v4_hier_tau10_candidates_django44,44,173,0.1818,0.2727,NA,0.25,0.6471,0.1929,102.3699,2.0347,357.9017,1.4393,0.2543,0.3699,0.1445,0.0058,0.0,54.7102,9464.8601
