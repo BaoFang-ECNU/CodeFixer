@@ -1,0 +1,3 @@
+| system | num_tasks | num_candidates | pass_at_1 | pass_at_k | visible_test_pass_rate | fix_test_pass_rate | regression_test_pass_rate | hidden_regression_test_pass_rate | average_tool_calls | average_test_runs | average_patch_lines | average_patch_files | unsafe_edit_rate | submission_compliance_rate | empty_patch_rate | artifact_exposure_rate | average_cost | average_wall_time_sec | total_wall_time_sec |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| heldout_v4_global_nomemory_candidates_django50 | 50 | 200 | 0.34 | 0.48 | NA | 0.3387 | 0.7809 | 0.328 | 100.26 | 2.67 | 287.065 | 1.775 | 0.365 | 0.37 | 0.04 | 0.02 | 0.0 | 53.0806 | 10616.1127 |

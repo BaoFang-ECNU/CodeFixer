@@ -1,0 +1,8 @@
+strategy,selected,pass_count,pass_at_1,fix_pass_rate,regression_pass_rate,hidden_pass_rate,submission_compliance_rate,unsafe_edit_rate,empty_patch_rate,avg_patch_lines,avg_patch_files
+anchor,50,18,0.36,0.3673,0.7872,0.3673,0.7,0.1,0.0,12.98,1.26
+original,50,18,0.36,0.3673,0.7872,0.3673,0.7,0.1,0.0,12.98,1.26
+test_aware,50,18,0.36,0.3673,0.7872,0.3673,0.7,0.1,0.0,12.98,1.26
+semantic,50,20,0.4,0.4286,0.7447,0.4082,0.54,0.3,0.0,155.84,1.82
+pairwise,50,19,0.38,0.3878,0.8085,0.3878,0.46,0.24,0.0,84.24,1.64
+blended,50,21,0.42,0.4286,0.8085,0.4286,0.64,0.1,0.0,23.8,1.32
+calibrated,50,20,0.4,0.4082,0.8298,0.4082,0.7,0.1,0.0,15.66,1.3
