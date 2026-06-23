@@ -202,6 +202,8 @@ report_final_artifacts/
 
 ```text
 report_final_artifacts/metrics/
+report_final_artifacts/metrics/v5_blended_selector/system_metrics.csv
+report_final_artifacts/metrics/v5_blended_selector/candidate_metrics.csv
 report_final_artifacts/selectors/selector_summary.csv
 report_final_artifacts/selectors/selected_blended.csv
 report_final_artifacts/judge/semantic_scores.jsonl
@@ -213,8 +215,10 @@ report_final_artifacts/diagnostics/memory_tiebreaker_curve.csv
 原始压缩包也保留在仓库根目录：
 
 ```text
-report_final_artifacts_20260623_072542.tar.gz
+report_final_artifacts_with_v5_20260623_074530.tar.gz
 ```
+
+其中 `metrics/v5_blended_selector/system_metrics.csv` 是用于对齐作业 6.3 指标的最终 V5 汇总，包含 pass@1、pass@k、average tool calls、average test runs、average wall time、patch size、compliance、unsafe edit、empty patch 和 artifact exposure。
 
 ## 8. 报告/Poster 中应避免的表述
 

@@ -1,0 +1,3 @@
+| system | num_tasks | num_candidates | pass_at_1 | pass_at_k | visible_test_pass_rate | fix_test_pass_rate | regression_test_pass_rate | hidden_regression_test_pass_rate | average_tool_calls | average_test_runs | average_patch_lines | average_patch_files | unsafe_edit_rate | submission_compliance_rate | empty_patch_rate | artifact_exposure_rate | average_cost | average_wall_time_sec | total_wall_time_sec |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| v5_blended_selector | 50 | 50 | 0.42 | 0.42 | NA | 0.4286 | 0.8085 | 0.4286 | 91.48 | 2.22 | 23.8 | 1.32 | 0.1 | 0.64 | 0.0 | 0.0 | 0.0 | 47.8916 | 2394.5794 |
